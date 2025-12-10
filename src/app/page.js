@@ -54,9 +54,6 @@ export default function HomePage() {
       <header className="header">
         <div>
           <h1 className="site-title">Ranking de Pádel - Panamá</h1>
-          <p className="muted">
-            Listado filtrable por género, categoría y tipo de puntaje
-          </p>
         </div>
         <div className="controls" />
       </header>
