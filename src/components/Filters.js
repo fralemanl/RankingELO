@@ -8,6 +8,8 @@ export default function Filters({
   onChangeCategory,
   scoreType,
   onChangeScoreType,
+  verified,
+  onChangeVerified,
 }) {
   return (
     <div className="filters" style={{ marginBottom: 16 }}>
@@ -42,6 +44,18 @@ export default function Filters({
           <option value="SUM_OF_POINTS_HISTORICO">Histórico</option>
           <option value="SUM_OF_POINTS_GLOBAL">Global (365d)</option>
           <option value="SUM_OF_POINTS_RACE">Race</option>
+        </select>
+      </div>
+
+      <div className="filter-group">
+        <label>Verificado</label>
+        <select
+          value={verified}
+          onChange={(e) => onChangeVerified(e.target.value)}
+        >
+          <option value="all">Todos</option>
+          <option value="true">Sí</option>
+          <option value="false">No</option>
         </select>
       </div>
     </div>

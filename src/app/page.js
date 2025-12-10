@@ -9,6 +9,7 @@ export default function HomePage() {
   const [gender, setGender] = useState("masculino");
   const [category, setCategory] = useState("all");
   const [scoreType, setScoreType] = useState("SUM_OF_POINTS_GLOBAL");
+  const [verified, setVerified] = useState("all");
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,11 +44,25 @@ export default function HomePage() {
     return ["all", ...Array.from(set).sort()];
   }, [players]);
 
-  // aplicar filtro por categoría
+  // aplicar filtros por categoría y verificado
   const visiblePlayers = useMemo(() => {
-    if (category === "all") return players;
-    return players.filter((p) => (p.CATEGORY || "") === category);
-  }, [players, category]);
+    let filtered = players;
+
+    if (category !== "all") {
+      filtered = filtered.filter((p) => (p.CATEGORY || "") === category);
+    }
+
+    if (verified !== "all") {
+      const isVerified = verified === "true";
+      filtered = filtered.filter((p) => {
+        const playerVerified =
+          p.VERIFIED === "TRUE" || p.VERIFIED === "1" || p.VERIFIED === true;
+        return playerVerified === isVerified;
+      });
+    }
+
+    return filtered;
+  }, [players, category, verified]);
 
   return (
     <main className="main">
@@ -67,6 +82,8 @@ export default function HomePage() {
           onChangeCategory={(c) => setCategory(c)}
           scoreType={scoreType}
           onChangeScoreType={(s) => setScoreType(s)}
+          verified={verified}
+          onChangeVerified={(v) => setVerified(v)}
         />
       </section>
 
