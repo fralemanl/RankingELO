@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { fetchPlayers } from "@/lib/sheets";
+import { fetchPlayers, fetchGames } from "@/lib/sheets";
+import PlayerRadar from "@/components/PlayerRadar";
 
 export default function PlayerPageClient() {
   const params = useParams();
@@ -14,6 +15,8 @@ export default function PlayerPageClient() {
 
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [games, setGames] = useState([]);
+  const [filteredGames, setFilteredGames] = useState([]);
 
   useEffect(() => {
     if (!playerId) return;
@@ -48,6 +51,56 @@ export default function PlayerPageClient() {
       mounted = false;
     };
   }, [playerId, gender]);
+
+  // Carga la hoja de juegos y filtra por el jugador cuando esté disponible
+  useEffect(() => {
+    let mounted = true;
+    if (!player) {
+      setGames([]);
+      setFilteredGames([]);
+      return;
+    }
+
+    // fetchGames devuelve [] si no está configurado el GID en `sheets.js`
+    fetchGames()
+      .then((rows) => {
+        if (!mounted) return;
+        setGames(rows || []);
+
+        const nameCandidates = [
+          player.NAME,
+          player.Name,
+          player.name,
+          player.NOMBRE,
+          player.Nombre,
+          player.nombre,
+        ].filter(Boolean).map((s) => String(s).trim().toLowerCase());
+
+        // Filtrar filas donde cualquier valor de la fila contiene el nombre del jugador
+        const matches = (rows || []).filter((row) => {
+          for (const v of Object.values(row)) {
+            if (!v) continue;
+            const txt = String(v).toLowerCase();
+            for (const n of nameCandidates) {
+              if (n && txt.includes(n)) return true;
+            }
+          }
+          return false;
+        });
+
+        setFilteredGames(matches);
+      })
+      .catch((err) => {
+        console.error("Error fetching games:", err);
+        if (!mounted) return;
+        setGames([]);
+        setFilteredGames([]);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [player]);
 
   if (!playerId) {
     return (
@@ -141,6 +194,45 @@ export default function PlayerPageClient() {
           </span>
         </div>
       </div>
+
+      <section style={{ marginTop: 24, textAlign: "center" }}>
+        <h3>Estadísticas</h3>
+        <PlayerRadar player={player} />
+      </section>
+
+      <section style={{ marginTop: 24 }}>
+        <h3>Resultados</h3>
+        {filteredGames.length === 0 ? (
+          <p>Sin resultados registrados para este jugador (o configurar `GAMES_SHEET_GID`).</p>
+        ) : (
+          <div className="games-table" style={{ overflowX: "auto" }}>
+            <table style={{ fontSize: "0.85rem" }}>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Torneo</th>
+                  <th>Categoría</th>
+                  <th>Pareja</th>
+                  <th>Posición</th>
+                  <th>Puntos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredGames.map((r, idx) => (
+                  <tr key={idx}>
+                    <td>{r.DATE || r.Date || r.date || r.FECHA || r.Fecha || r.fecha || "-"}</td>
+                    <td>{r.TOURNAMENT || r.Tournament || r.tournament || r.TORNEO || r.Torneo || r.torneo || r.TOURNAMENT_NAME || r.NAME || "-"}</td>
+                    <td>{r.CATEGORY || r.Category || r.category || r.CATEGORIA || r.Categoria || r.categoria || "-"}</td>
+                    <td>{r.COUPLE_NAME || r.Couple_Name || r.couple_name || r.PARTNER || r.Partner || r.partner || r.PAREJA || r.Pareja || r.pareja || r.PARTNER_NAME || "-"}</td>
+                    <td>{r.POSITION || r.Position || r.position || r.POSICION || r.Posicion || r.posicion || "-"}</td>
+                    <td>{r.POINTS || r.Points || r.points || r.PUNTOS || r.Puntos || r.puntos || "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
