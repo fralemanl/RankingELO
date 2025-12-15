@@ -84,6 +84,13 @@ export default function PlayerPageClient() {
           return playerNameColumn && playerNameColumn.toLowerCase() === playerName.toLowerCase();
         });
 
+        // Ordenar por fecha de menor a mayor
+        matches.sort((a, b) => {
+          const dateA = a.DATE || a.Date || a.date || a.FECHA || a.Fecha || a.fecha || "";
+          const dateB = b.DATE || b.Date || b.date || b.FECHA || b.Fecha || b.fecha || "";
+          return new Date(dateA) - new Date(dateB);
+        });
+
         setFilteredGames(matches);
       })
       .catch((err) => {
