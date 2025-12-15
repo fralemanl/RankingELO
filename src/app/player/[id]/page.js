@@ -69,25 +69,19 @@ export default function PlayerPageClient() {
         if (!mounted) return;
         setGames(rows || []);
 
-        const nameCandidates = [
+        const playerName = [
           player.NAME,
           player.Name,
           player.name,
           player.NOMBRE,
           player.Nombre,
           player.nombre,
-        ].filter(Boolean).map((s) => String(s).trim().toLowerCase());
+        ].filter(Boolean)[0] || "";
 
-        // Filtrar filas donde cualquier valor de la fila contiene el nombre del jugador
+        // Filtrar filas donde la columna B (PLAYER_NAME) coincide exactamente con el nombre del jugador
         const matches = (rows || []).filter((row) => {
-          for (const v of Object.values(row)) {
-            if (!v) continue;
-            const txt = String(v).toLowerCase();
-            for (const n of nameCandidates) {
-              if (n && txt.includes(n)) return true;
-            }
-          }
-          return false;
+          const playerNameColumn = (row.PLAYER_NAME || row.Player_Name || row.player_name || "").trim();
+          return playerNameColumn && playerNameColumn.toLowerCase() === playerName.toLowerCase();
         });
 
         setFilteredGames(matches);
