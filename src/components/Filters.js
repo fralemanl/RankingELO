@@ -6,6 +6,8 @@ export default function Filters({
   categories = [],
   category,
   onChangeCategory,
+  searchTerm,
+  onChangeSearchTerm,
 }) {
   const filterStyles = {
     container: {
@@ -101,6 +103,36 @@ export default function Filters({
           </select>
         </div>
 
+      </div>
+
+      {/* Buscador */}
+      <div style={filterStyles.group}>
+        <label style={filterStyles.label}>
+          <svg
+            style={filterStyles.icon}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            color="rgb(59, 130, 246)"
+          >
+            <path
+              fillRule="evenodd"
+              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.817-4.817A6 6 0 012 8z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Buscar jugador
+        </label>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => onChangeSearchTerm(e.target.value)}
+          placeholder="Nombre del jugador"
+          style={{
+            padding: "0.5rem 0.75rem",
+            borderRadius: "0.5rem",
+            border: "1px solid rgb(226, 232, 240)",
+          }}
+        />
       </div>
     </div>
   );

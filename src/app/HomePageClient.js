@@ -25,6 +25,7 @@ export default function HomePageClient() {
   const searchParams = useSearchParams();
   const [gender, setGender] = useState("masculino");
   const [category, setCategory] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const initializedRef = useRef(false);
   const storageKey = "rankingEloFilters";
   const [players, setPlayers] = useState([]);
@@ -39,6 +40,7 @@ export default function HomePageClient() {
 
     let nextGender = paramGender || "masculino";
     let nextCategory = paramCategory || "all";
+    let nextSearchTerm = "";
 
     if (!paramGender || !paramCategory) {
       const stored = window.sessionStorage.getItem(storageKey);
@@ -47,6 +49,7 @@ export default function HomePageClient() {
           const parsed = JSON.parse(stored);
           if (!paramGender && parsed?.gender) nextGender = parsed.gender;
           if (!paramCategory && parsed?.category) nextCategory = parsed.category;
+          if (parsed?.searchTerm) nextSearchTerm = parsed.searchTerm;
         } catch {
           // ignore parse errors
         }
@@ -55,6 +58,7 @@ export default function HomePageClient() {
 
     setGender(nextGender);
     setCategory(nextCategory);
+    setSearchTerm(nextSearchTerm);
     initializedRef.current = true;
 
     const params = new URLSearchParams(window.location.search);
@@ -69,7 +73,7 @@ export default function HomePageClient() {
     if (!initializedRef.current || typeof window === "undefined") return;
     window.sessionStorage.setItem(
       storageKey,
-      JSON.stringify({ gender, category })
+      JSON.stringify({ gender, category, searchTerm })
     );
 
     const params = new URLSearchParams(window.location.search);
@@ -131,8 +135,15 @@ export default function HomePageClient() {
       filtered = filtered.filter((p) => (p.CATEGORY || "") === category);
     }
 
+    if (searchTerm.trim()) {
+      const term = searchTerm.trim().toLowerCase();
+      filtered = filtered.filter((p) =>
+        (p.NAME || "").toLowerCase().includes(term)
+      );
+    }
+
     return filtered;
-  }, [players, category]);
+  }, [players, category, searchTerm]);
 
   return (
     <div
@@ -164,6 +175,8 @@ export default function HomePageClient() {
             categories={categories}
             category={category}
             onChangeCategory={(c) => setCategory(c)}
+            searchTerm={searchTerm}
+            onChangeSearchTerm={(term) => setSearchTerm(term)}
           />
         </section>
 
