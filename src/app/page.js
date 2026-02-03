@@ -1,18 +1,85 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { fetchPlayers } from "@/lib/sheets";
 import Filters from "@/components/Filters";
 import RankingTable from "@/components/RankingTable";
 import TopPlayersShowcase from "@/components/TopPlayersShowcase";
 
+const COLUMN_INDEX = {
+  NAME: 1, // Columna B
+  ELO: 3, // Columna D
+  CATEGORY: 4, // Columna E
+  PHOTO: 17, // Columna R
+};
+
+const getColumnValue = (row, index) => {
+  if (!row) return "";
+  if (Array.isArray(row)) return row[index] || "";
+  if (row.__values) return row.__values[index] || "";
+  return "";
+};
+
 export default function HomePage() {
+  const searchParams = useSearchParams();
   const [gender, setGender] = useState("masculino");
   const [category, setCategory] = useState("all");
-  const [scoreType, setScoreType] = useState("SUM_OF_POINTS_GLOBAL");
-  const [verified, setVerified] = useState("all");
+  const initializedRef = useRef(false);
+  const storageKey = "rankingEloFilters";
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (initializedRef.current) return;
+
+    const paramGender = searchParams?.get("gender");
+    const paramCategory = searchParams?.get("category");
+
+    let nextGender = paramGender || "masculino";
+    let nextCategory = paramCategory || "all";
+
+    if (!paramGender || !paramCategory) {
+      const stored = window.sessionStorage.getItem(storageKey);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (!paramGender && parsed?.gender) nextGender = parsed.gender;
+          if (!paramCategory && parsed?.category) nextCategory = parsed.category;
+        } catch {
+          // ignore parse errors
+        }
+      }
+    }
+
+    setGender(nextGender);
+    setCategory(nextCategory);
+    initializedRef.current = true;
+
+    const params = new URLSearchParams(window.location.search);
+    params.set("gender", nextGender);
+    params.set("category", nextCategory);
+    const query = params.toString();
+    const nextUrl = query ? `/?${query}` : "/";
+    window.history.replaceState(null, "", nextUrl);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!initializedRef.current || typeof window === "undefined") return;
+    window.sessionStorage.setItem(
+      storageKey,
+      JSON.stringify({ gender, category })
+    );
+
+    const params = new URLSearchParams(window.location.search);
+    params.set("gender", gender);
+    params.set("category", category);
+    const query = params.toString();
+    const nextUrl = query ? `/?${query}` : "/";
+
+    window.history.replaceState(null, "", nextUrl);
+  }, [gender, category]);
 
   useEffect(() => {
     let mounted = true;
@@ -22,7 +89,21 @@ export default function HomePage() {
         if (!mounted) return;
         const mapped = data
           .filter(Boolean)
-          .map((p) => ({ ...p, gender }))
+          .map((row) => {
+            const name = getColumnValue(row, COLUMN_INDEX.NAME);
+            const categoryValue = getColumnValue(row, COLUMN_INDEX.CATEGORY);
+            const eloValue = getColumnValue(row, COLUMN_INDEX.ELO);
+            const photoValue = getColumnValue(row, COLUMN_INDEX.PHOTO);
+            return {
+              NAME: name,
+              CATEGORY: categoryValue,
+              ELO: parseFloat(eloValue) || 0,
+              ELO_DISPLAY: eloValue,
+              FOTO: photoValue,
+              gender,
+              _raw: row,
+            };
+          })
           .filter((p) => p.NAME && p.NAME.trim() !== "");
         setPlayers(mapped);
         setLoading(false);
@@ -50,17 +131,8 @@ export default function HomePage() {
       filtered = filtered.filter((p) => (p.CATEGORY || "") === category);
     }
 
-    if (verified !== "all") {
-      const isVerified = verified === "true";
-      filtered = filtered.filter((p) => {
-        const playerVerified =
-          p.VERIFIED === "TRUE" || p.VERIFIED === "1" || p.VERIFIED === true;
-        return playerVerified === isVerified;
-      });
-    }
-
     return filtered;
-  }, [players, category, verified]);
+  }, [players, category]);
 
   return (
     <div
@@ -80,7 +152,7 @@ export default function HomePage() {
           <TopPlayersShowcase
             players={visiblePlayers}
             gender={gender}
-            scoreType={scoreType}
+            category={category}
           />
         )}
 
@@ -94,10 +166,6 @@ export default function HomePage() {
             categories={categories}
             category={category}
             onChangeCategory={(c) => setCategory(c)}
-            scoreType={scoreType}
-            onChangeScoreType={(s) => setScoreType(s)}
-            verified={verified}
-            onChangeVerified={(v) => setVerified(v)}
           />
         </section>
 
@@ -336,8 +404,8 @@ export default function HomePage() {
           ) : visiblePlayers.length > 0 ? (
             <RankingTable
               players={visiblePlayers}
-              scoreType={scoreType}
               allPlayers={players}
+              category={category}
             />
           ) : (
             <div

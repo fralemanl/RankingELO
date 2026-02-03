@@ -1,5 +1,7 @@
+import Papa from "papaparse";
+
 // Convierte el Google Sheets a URL de CSV público
-const SHEET_ID = "11jcr7on8kUp5V93e33QcdNUJzYFOJRx1-AfsKG4jXt4";
+const SHEET_ID = "1ngL0JRuJJTfE6N6qqE3khmdLCo-y9qrePdJ7-1F5VHU";
 
 // Si tienes una hoja con los partidos/partidos por jugador, pon aquí su GID.
 // Puedes obtenerlo desde la URL de Google Sheets: ...&gid=XXXXXXXX
@@ -92,18 +94,28 @@ async function parseCsvUrl(url) {
   try {
     const res = await fetch(url);
     const csv = await res.text();
-    const lines = csv.split("\n").filter(Boolean);
-    if (lines.length === 0) return [];
-    const headers = lines[0].split(",").map((h) => h.trim());
+    const parsed = Papa.parse(csv, {
+      skipEmptyLines: true,
+    });
+
+    const data = Array.isArray(parsed.data) ? parsed.data : [];
+    if (data.length === 0) return [];
+
+    const headers = (data[0] || []).map((h) => String(h || "").trim());
     const rows = [];
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(",");
+
+    for (let i = 1; i < data.length; i++) {
+      const values = Array.isArray(data[i]) ? data[i] : [];
+      const normalizedValues = values.map((v) => String(v || "").trim());
       const obj = {};
       headers.forEach((h, idx) => {
-        obj[h] = (values[idx] || "").trim();
+        obj[h] = normalizedValues[idx] || "";
       });
+      obj.__values = normalizedValues;
+      obj.__headers = headers;
       rows.push(obj);
     }
+
     return rows;
   } catch (err) {
     console.error("parseCsvUrl error:", err);
@@ -113,10 +125,9 @@ async function parseCsvUrl(url) {
 
 export async function fetchPlayers(gender) {
   try {
-    // Estas URLs antiguas estaban en el repo; si funcionan deje que el autor las mantenga.
-    // Sin embargo, preferimos construir desde SHEET_ID y GID si es posible.
-    const maleGid = "2054985208";
-    const femaleGid = "183727632";
+    // GID actuales del sheet compartido por el usuario.
+    const maleGid = "125655773";
+    const femaleGid = "2001777580";
     const url = gender === "masculino" ? buildCsvUrl(maleGid) : buildCsvUrl(femaleGid);
     return await parseCsvUrl(url);
   } catch (error) {

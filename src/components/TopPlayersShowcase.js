@@ -7,14 +7,14 @@ import {
   buildGoogleDriveThumbnailUrl,
 } from "@/lib/sheets";
 
-export default function TopPlayersShowcase({ players, gender, scoreType }) {
+export default function TopPlayersShowcase({ players, gender, category }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const getFoto = (p) => (p?.FOTO || p?.Foto || p?.foto || "").trim();
 
   const sortedPlayers = [...players].sort((a, b) => {
-    const scoreA = parseFloat(a[scoreType]) || 0;
-    const scoreB = parseFloat(b[scoreType]) || 0;
+    const scoreA = parseFloat(a.ELO) || 0;
+    const scoreB = parseFloat(b.ELO) || 0;
     return scoreB - scoreA;
   });
 
@@ -56,7 +56,7 @@ export default function TopPlayersShowcase({ players, gender, scoreType }) {
   const medal = getMedalEmoji(currentIndex);
   const medalColor = getMedalColor(currentIndex);
   const playerName = getPlayerName(player);
-  const score = parseFloat(player[scoreType]) || 0;
+  const score = player.ELO_DISPLAY || player.ELO || 0;
 
   return (
     <section
@@ -159,7 +159,11 @@ export default function TopPlayersShowcase({ players, gender, scoreType }) {
           {/* Contenido del jugador con animación */}
           <Link
             key={currentIndex}
-            href={`/player/${encodeURIComponent(playerName)}?gender=${gender}`}
+            href={`/player/${encodeURIComponent(
+              playerName
+            )}?gender=${encodeURIComponent(
+              gender
+            )}&category=${encodeURIComponent(category || "all")}`}
             style={{ textDecoration: "none", flex: 1, display: "flex", justifyContent: "center" }}
           >
             <div
@@ -231,9 +235,10 @@ export default function TopPlayersShowcase({ players, gender, scoreType }) {
                     fontSize: "0.85rem",
                     fontWeight: "600",
                     width: "fit-content",
+                    textTransform: "uppercase",
                   }}
                 >
-                  {player.CATEGORY || player.Category || player.categoria || "-"}
+                  CATEGORIA : {player.CATEGORY || player.Category || player.categoria || "-"}
                 </span>
 
                 {/* Puntaje */}
@@ -258,7 +263,7 @@ export default function TopPlayersShowcase({ players, gender, scoreType }) {
                         margin: "0 0 0.2rem 0",
                       }}
                     >
-                      Puntos
+                      ELO
                     </p>
                     <p style={{ fontSize: "1.5rem", fontWeight: "bold", margin: "0" }}>
                       {score}

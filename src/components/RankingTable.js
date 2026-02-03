@@ -6,32 +6,21 @@ import {
   buildGoogleDriveThumbnailUrl,
 } from "@/lib/sheets";
 
-export default function RankingTable({ players, scoreType, allPlayers = [] }) {
-  const scoreLabel = {
-    SUM_OF_POINTS_HISTORICO: "Histórico",
-    SUM_OF_POINTS_GLOBAL: "Global",
-    SUM_OF_POINTS_RACE: "Race",
-  }[scoreType];
-
+export default function RankingTable({ players, allPlayers = [], category }) {
   const getFoto = (p) => (p?.FOTO || p?.Foto || p?.foto || "").trim();
 
-  const tournamentKey = scoreType.replace(
-    "SUM_OF_POINTS",
-    "SUM_OF_TOURNAMENTS"
-  );
-
   const sortedPlayers = [...players].sort((a, b) => {
-    const scoreA = parseFloat(a[scoreType]) || 0;
-    const scoreB = parseFloat(b[scoreType]) || 0;
+    const scoreA = parseFloat(a.ELO) || 0;
+    const scoreB = parseFloat(b.ELO) || 0;
     return scoreB - scoreA;
   });
 
-  // Calcular el ranking global
+  // Calcular el ranking global por ELO
   const globalSortedPlayers = [
     ...(allPlayers.length > 0 ? allPlayers : players),
   ].sort((a, b) => {
-    const scoreA = parseFloat(a[scoreType]) || 0;
-    const scoreB = parseFloat(b[scoreType]) || 0;
+    const scoreA = parseFloat(a.ELO) || 0;
+    const scoreB = parseFloat(b.ELO) || 0;
     return scoreB - scoreA;
   });
 
@@ -39,6 +28,27 @@ export default function RankingTable({ players, scoreType, allPlayers = [] }) {
     return (
       globalSortedPlayers.findIndex((p) => p.NAME === player.NAME) + 1 || "—"
     );
+  };
+
+  const categoryRankMap = sortedPlayers.reduce((acc, player) => {
+    const key = (player.CATEGORY || "").trim() || "—";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(player);
+    return acc;
+  }, {});
+
+  Object.keys(categoryRankMap).forEach((key) => {
+    categoryRankMap[key].sort((a, b) => {
+      const scoreA = parseFloat(a.ELO) || 0;
+      const scoreB = parseFloat(b.ELO) || 0;
+      return scoreB - scoreA;
+    });
+  });
+
+  const getCategoryRank = (player) => {
+    const key = (player.CATEGORY || "").trim() || "—";
+    const list = categoryRankMap[key] || [];
+    return list.findIndex((p) => p.NAME === player.NAME) + 1 || "—";
   };
 
   const getMedalEmoji = (index) => {
@@ -125,22 +135,6 @@ export default function RankingTable({ players, scoreType, allPlayers = [] }) {
       fontSize: "1.125rem",
       color: "rgb(15, 23, 42)",
     },
-    averageCell: {
-      textAlign: "center",
-      color: "rgb(71, 85, 105)",
-      fontWeight: "500",
-    },
-    tournamentsCell: {
-      textAlign: "center",
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "0.25rem",
-      backgroundColor: "rgb(221, 214, 254)",
-      color: "rgb(88, 28, 135)",
-      padding: "0.25rem 0.75rem",
-      borderRadius: "0.5rem",
-      fontWeight: "600",
-    },
   };
 
   return (
@@ -148,28 +142,23 @@ export default function RankingTable({ players, scoreType, allPlayers = [] }) {
       <table style={tableStyles.table}>
         <thead style={tableStyles.thead}>
           <tr>
-            <th style={tableStyles.th}>#</th>
+            <th style={tableStyles.th}># Cat.</th>
             <th style={tableStyles.th}>Jugador</th>
             <th style={tableStyles.th}>Categoría</th>
             <th style={{ ...tableStyles.th, textAlign: "center" }}>
               Global 🌍
             </th>
-            <th style={{ ...tableStyles.th, textAlign: "center" }}>Puntos</th>
-            <th style={{ ...tableStyles.th, textAlign: "center" }}>Promedio</th>
-            <th style={{ ...tableStyles.th, textAlign: "center" }}>Torneos</th>
+            <th style={{ ...tableStyles.th, textAlign: "center" }}>ELO</th>
           </tr>
         </thead>
         <tbody style={tableStyles.tbody}>
           {sortedPlayers.map((player, index) => {
-            const averageKey = scoreType.replace(
-              "SUM_OF_POINTS",
-              "AVERAGE_OF_POINTS"
-            );
             const fotoValue = getFoto(player);
             const fotoSrc =
               buildGoogleDriveImageUrl(fotoValue) ||
               buildGoogleDriveThumbnailUrl(fotoValue, 120);
             const medal = getMedalEmoji(index);
+            const categoryRank = getCategoryRank(player);
 
             return (
               <tr
@@ -184,13 +173,10 @@ export default function RankingTable({ players, scoreType, allPlayers = [] }) {
               >
                 <td style={tableStyles.td}>
                   <div style={tableStyles.rankCell}>
-                    {medal ? (
-                      <span style={{ fontSize: "1.5rem" }}>{medal}</span>
-                    ) : (
-                      <span style={{ color: "rgb(100, 116, 139)" }}>
-                        {index + 1}
-                      </span>
-                    )}
+                    <span style={{ color: "rgb(100, 116, 139)" }}>
+                      {categoryRank}
+                    </span>
+                    {medal && <span style={{ fontSize: "1.5rem" }}>{medal}</span>}
                   </div>
                 </td>
                 <td style={tableStyles.td}>
@@ -218,7 +204,11 @@ export default function RankingTable({ players, scoreType, allPlayers = [] }) {
                     <Link
                       href={`/player/${encodeURIComponent(
                         player.NAME
-                      )}?gender=${player.gender}`}
+                      )}?gender=${encodeURIComponent(
+                        player.gender
+                      )}&category=${encodeURIComponent(
+                        category || "all"
+                      )}`}
                       style={tableStyles.playerLink}
                       onMouseOver={(e) => {
                         e.currentTarget.style.color = "rgb(8, 145, 178)";
@@ -252,14 +242,8 @@ export default function RankingTable({ players, scoreType, allPlayers = [] }) {
                     #{getGlobalRank(player)}
                   </span>
                 </td>
-                <td style={tableStyles.scoreCell}>{player[scoreType] || 0}</td>
-                <td style={tableStyles.averageCell}>
-                  {parseFloat(player[averageKey] || 0).toFixed(2)}
-                </td>
-                <td style={tableStyles.td}>
-                  <div style={tableStyles.tournamentsCell}>
-                    {player[tournamentKey] || 0}
-                  </div>
+                <td style={tableStyles.scoreCell}>
+                  {player.ELO_DISPLAY || player.ELO || 0}
                 </td>
               </tr>
             );

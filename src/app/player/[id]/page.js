@@ -11,14 +11,39 @@ import {
 } from "@/lib/sheets";
 import PlayerRadar from "@/components/PlayerRadar";
 
+const COLUMN_INDEX = {
+  NAME: 1, // B
+  ELO: 3, // D
+  CATEGORY: 4, // E
+  TOURNAMENTS: 5, // F
+  MATCHES: 6, // G
+  WINS: 7, // H
+  EFFECTIVENESS: 8, // I
+  VERIFIED: 9, // J
+  RADAR_START: 10, // K
+  RADAR_END: 16, // Q
+  PHOTO: 17, // R
+};
+
+const getColumnValue = (row, index) => {
+  if (!row) return "";
+  if (Array.isArray(row)) return row[index] || "";
+  if (row.__values) return row.__values[index] || "";
+  return "";
+};
+
+const RADAR_FALLBACK_LABELS = ["K", "L", "M", "N", "O", "P", "Q"];
+
 export default function PlayerPageClient() {
   const params = useParams();
   const searchParams = useSearchParams();
 
   const playerId = params?.id ? decodeURIComponent(params.id) : "";
   const gender = searchParams?.get("gender") || "masculino";
+  const category = searchParams?.get("category") || "all";
 
   const [player, setPlayer] = useState(null);
+  const [allPlayers, setAllPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [games, setGames] = useState([]);
   const [filteredGames, setFilteredGames] = useState([]);
@@ -32,16 +57,44 @@ export default function PlayerPageClient() {
     fetchPlayers(gender)
       .then((players) => {
         if (!mounted) return;
-        const found = players.find((p) => {
-          const name = (
-            p.NAME ||
-            p.Name ||
-            p.name ||
-            p.NOMBRE ||
-            p.Nombre ||
-            p.nombre ||
-            ""
-          ).trim();
+        const normalized = (players || []).map((row) => {
+          const name = getColumnValue(row, COLUMN_INDEX.NAME);
+          const categoryValue = getColumnValue(row, COLUMN_INDEX.CATEGORY);
+          const eloValue = getColumnValue(row, COLUMN_INDEX.ELO);
+          const photoValue = getColumnValue(row, COLUMN_INDEX.PHOTO);
+          const tournaments = getColumnValue(row, COLUMN_INDEX.TOURNAMENTS);
+          const matches = getColumnValue(row, COLUMN_INDEX.MATCHES);
+          const wins = getColumnValue(row, COLUMN_INDEX.WINS);
+          const effectiveness = getColumnValue(row, COLUMN_INDEX.EFFECTIVENESS);
+          const verified = getColumnValue(row, COLUMN_INDEX.VERIFIED);
+          const headers = row?.__headers || [];
+          const radarStats = [];
+          for (let idx = COLUMN_INDEX.RADAR_START; idx <= COLUMN_INDEX.RADAR_END; idx += 1) {
+            const label = headers[idx] || RADAR_FALLBACK_LABELS[idx - COLUMN_INDEX.RADAR_START];
+            radarStats.push({
+              stat: label || `Col ${idx + 1}`,
+              value: parseFloat(getColumnValue(row, idx)) || 0,
+            });
+          }
+          return {
+            NAME: name,
+            CATEGORY: categoryValue,
+            ELO: parseFloat(eloValue) || 0,
+            ELO_DISPLAY: eloValue,
+            FOTO: photoValue,
+            TOURNAMENTS: tournaments,
+            MATCHES: matches,
+            WINS: wins,
+            EFFECTIVENESS: effectiveness,
+            VERIFIED: verified,
+            RADAR_STATS: radarStats,
+            gender,
+            _raw: row,
+          };
+        });
+        setAllPlayers(normalized);
+        const found = normalized.find((p) => {
+          const name = (p.NAME || "").trim();
           return name && name === playerId;
         });
         setPlayer(found || null);
@@ -175,7 +228,9 @@ export default function PlayerPageClient() {
         style={{ maxWidth: "80rem", margin: "0 auto", padding: "2rem 1rem" }}
       >
         <Link
-          href="/"
+          href={`/?gender=${encodeURIComponent(
+            gender
+          )}&category=${encodeURIComponent(category)}`}
           style={{
             color: "rgb(6, 182, 212)",
             textDecoration: "none",
@@ -203,29 +258,32 @@ export default function PlayerPageClient() {
     );
   }
 
-  const name =
-    player.NAME ||
-    player.Name ||
-    player.name ||
-    player.NOMBRE ||
-    player.Nombre ||
-    player.nombre ||
-    playerId;
+  const name = player.NAME || playerId;
 
   const foto = getFoto(player);
   const fotoSrc =
     buildGoogleDriveImageUrl(foto) || buildGoogleDriveThumbnailUrl(foto);
 
-  const historico = parseFloat(
-    player.SUM_OF_POINTS_HISTORICO || player.SUM_OF_POINTS_HIST || 0,
-  );
-  const global = parseFloat(player.SUM_OF_POINTS_GLOBAL || 0);
-  const race = parseFloat(player.SUM_OF_POINTS_RACE || 0);
-  const avgHistorico = parseFloat(
-    player.AVERAGE_OF_POINTS_HISTORICO || player.AVG_OF_POINTS_HISTORICO || 0,
-  ).toFixed(2);
-  const torneos = parseInt(player.SUM_OF_TOURNAMENTS_HISTORICO || 0);
-  const verified = player.VERIFIED === "TRUE" || player.VERIFIED === "1";
+  const eloDisplay = player.ELO_DISPLAY || player.ELO || 0;
+  const torneos = player.TOURNAMENTS || 0;
+  const partidos = player.MATCHES || 0;
+  const ganados = player.WINS || 0;
+  const efectividad = player.EFFECTIVENESS || 0;
+  const verified =
+    String(player.VERIFIED || "").toLowerCase() === "true" ||
+    String(player.VERIFIED || "").toLowerCase() === "1" ||
+    String(player.VERIFIED || "").toLowerCase() === "si";
+
+  const globalRank = (() => {
+    if (!allPlayers.length) return "—";
+    const sorted = [...allPlayers].sort((a, b) => {
+      const scoreA = parseFloat(a.ELO) || 0;
+      const scoreB = parseFloat(b.ELO) || 0;
+      return scoreB - scoreA;
+    });
+    const index = sorted.findIndex((p) => p.NAME === player.NAME);
+    return index >= 0 ? index + 1 : "—";
+  })();
 
   return (
     <div
@@ -239,57 +297,55 @@ export default function PlayerPageClient() {
       <div
         style={{ maxWidth: "80rem", margin: "0 auto", padding: "2rem 1rem" }}
       >
-        {/* Botón Volver */}
         <Link
           href="/"
           style={{
-            display: "inline-block",
-            marginBottom: "2rem",
             color: "rgb(6, 182, 212)",
             textDecoration: "none",
             fontWeight: "600",
-            transition: "all 0.3s ease-in-out",
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.color = "rgb(8, 145, 178)";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.color = "rgb(6, 182, 212)";
+            display: "inline-block",
+            marginBottom: "2rem",
           }}
         >
           ← Volver al ranking
         </Link>
-
-        {/* Hero Card con Foto y Nombre */}
         <div
           style={{
             backgroundColor: "white",
             borderRadius: "1.5rem",
-            padding: "3rem 2rem",
-            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-            textAlign: "center",
+            padding: "2.5rem",
+            boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
             marginBottom: "2rem",
-            animation: "slideUp 0.5s ease-out",
           }}
         >
-          {fotoSrc && (
-            <div style={{ marginBottom: "2rem" }}>
-              <div
-                style={{
-                  width: "180px",
-                  height: "180px",
-                  borderRadius: "50%",
-                  overflow: "hidden",
-                  backgroundColor: "rgb(226, 232, 240)",
-                  margin: "0 auto",
-                  border: "6px solid rgb(6, 182, 212)",
-                  boxShadow: "0 10px 25px -5px rgba(6, 182, 212, 0.3)",
-                }}
-              >
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "2rem",
+              alignItems: "center",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1.5rem",
+                alignItems: "center",
+              }}
+            >
+              {fotoSrc && (
                 <img
                   src={fotoSrc}
                   alt={name}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  style={{
+                    width: "200px",
+                    height: "260px",
+                    borderRadius: "1rem",
+                    objectFit: "cover",
+                    border: "4px solid rgb(6, 182, 212)",
+                    boxShadow: "0 10px 25px -5px rgba(6, 182, 212, 0.3)",
+                  }}
                   referrerPolicy="no-referrer"
                   onError={(e) => {
                     const thumb = buildGoogleDriveThumbnailUrl(foto);
@@ -301,217 +357,181 @@ export default function PlayerPageClient() {
                     e.currentTarget.style.display = "none";
                   }}
                 />
+              )}
+              <div style={{ textAlign: "center" }}>
+                <h1
+                  style={{
+                    fontSize: "2.5rem",
+                    fontWeight: "700",
+                    margin: 0,
+                    color: "rgb(15, 23, 42)",
+                  }}
+                >
+                  {name}
+                </h1>
+                <p
+                  style={{
+                    margin: "0.5rem 0 0",
+                    color: "rgb(71, 85, 105)",
+                    fontSize: "1.125rem",
+                  }}
+                >
+                  Categoría: {player.CATEGORY || "—"}
+                </p>
               </div>
             </div>
-          )}
 
-          <h1
-            style={{
-              fontSize: "2.5rem",
-              fontWeight: "bold",
-              color: "rgb(15, 23, 42)",
-              marginBottom: "0.5rem",
-            }}
-          >
-            {name}
-          </h1>
-          <p
-            style={{
-              fontSize: "1.125rem",
-              color: "rgb(100, 116, 139)",
-              marginBottom: "1.5rem",
-            }}
-          >
-            {gender === "femenino" ? "👩 Femenino" : "👨 Masculino"} •{" "}
-            {player.CATEGORY ||
-              player.Category ||
-              player.categoria ||
-              "Sin categoría"}
-          </p>
-          {verified && (
-            <span
+            <div
               style={{
-                display: "inline-block",
-                backgroundColor: "rgb(34, 197, 94)",
-                color: "white",
-                padding: "0.5rem 1rem",
-                borderRadius: "9999px",
-                fontSize: "0.875rem",
-                fontWeight: "600",
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
               }}
             >
-              ✓ Jugador Verificado
-            </span>
-          )}
-        </div>
+              <div
+                style={{
+                  background: "linear-gradient(135deg, rgb(6, 182, 212), rgb(14, 116, 144))",
+                  color: "white",
+                  borderRadius: "1rem",
+                  padding: "1.5rem",
+                  boxShadow: "0 10px 20px -5px rgba(6, 182, 212, 0.35)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "1rem",
+                }}
+              >
+                <div>
+                  <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.9 }}>
+                    ELO
+                  </p>
+                  <p style={{ margin: 0, fontSize: "2.5rem", fontWeight: "700" }}>
+                    {eloDisplay}
+                  </p>
+                </div>
+                <div
+                  style={{
+                    textAlign: "right",
+                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "0.75rem",
+                    padding: "0.5rem 0.75rem",
+                  }}
+                >
+                  <p style={{ margin: 0, fontSize: "0.75rem", opacity: 0.9 }}>
+                    Ranking Global
+                  </p>
+                  <p style={{ margin: 0, fontSize: "1.4rem", fontWeight: "700" }}>
+                    #{globalRank}
+                  </p>
+                </div>
+              </div>
 
-        {/* Tarjetas de Estadísticas */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "1.5rem",
-            marginBottom: "2rem",
-          }}
-        >
-          {/* Puntaje Histórico */}
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "1rem",
-              padding: "1.5rem",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-              borderLeft: "6px solid rgb(6, 182, 212)",
-              animation: "slideUp 0.5s ease-out 0.1s both",
-            }}
-          >
-            <p
-              style={{
-                color: "rgb(100, 116, 139)",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Puntaje Histórico
-            </p>
-            <p
-              style={{
-                fontSize: "2rem",
-                fontWeight: "bold",
-                color: "rgb(6, 182, 212)",
-              }}
-            >
-              {historico}
-            </p>
-          </div>
+              <div
+                style={{
+                  backgroundColor: "rgb(248, 250, 252)",
+                  borderRadius: "1rem",
+                  padding: "1.5rem",
+                  border: "1px solid rgb(226, 232, 240)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                    gap: "1rem",
+                  }}
+                >
+                  <div>
+                    <p style={{ margin: 0, color: "rgb(100, 116, 139)", fontSize: "0.8rem" }}>
+                      Torneos jugados
+                    </p>
+                    <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: "700" }}>
+                      {torneos}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ margin: 0, color: "rgb(100, 116, 139)", fontSize: "0.8rem" }}>
+                      Partidos jugados
+                    </p>
+                    <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: "700" }}>
+                      {partidos}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ margin: 0, color: "rgb(100, 116, 139)", fontSize: "0.8rem" }}>
+                      Partidos ganados
+                    </p>
+                    <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: "700" }}>
+                      {ganados}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ margin: 0, color: "rgb(100, 116, 139)", fontSize: "0.8rem" }}>
+                      Efectividad
+                    </p>
+                    <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: "700" }}>
+                      {efectividad}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-          {/* Puntaje Global */}
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "1rem",
-              padding: "1.5rem",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-              borderLeft: "6px solid rgb(139, 92, 246)",
-              animation: "slideUp 0.5s ease-out 0.2s both",
-            }}
-          >
-            <p
-              style={{
-                color: "rgb(100, 116, 139)",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Puntaje Global (365d)
-            </p>
-            <p
-              style={{
-                fontSize: "2rem",
-                fontWeight: "bold",
-                color: "rgb(139, 92, 246)",
-              }}
-            >
-              {global}
-            </p>
-          </div>
-
-          {/* Puntaje Race */}
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "1rem",
-              padding: "1.5rem",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-              borderLeft: "6px solid rgb(234, 88, 12)",
-              animation: "slideUp 0.5s ease-out 0.3s both",
-            }}
-          >
-            <p
-              style={{
-                color: "rgb(100, 116, 139)",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Puntaje Race
-            </p>
-            <p
-              style={{
-                fontSize: "2rem",
-                fontWeight: "bold",
-                color: "rgb(234, 88, 12)",
-              }}
-            >
-              {race}
-            </p>
-          </div>
-
-          {/* Promedio */}
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "1rem",
-              padding: "1.5rem",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-              borderLeft: "6px solid rgb(34, 197, 94)",
-              animation: "slideUp 0.5s ease-out 0.4s both",
-            }}
-          >
-            <p
-              style={{
-                color: "rgb(100, 116, 139)",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Promedio
-            </p>
-            <p
-              style={{
-                fontSize: "2rem",
-                fontWeight: "bold",
-                color: "rgb(34, 197, 94)",
-              }}
-            >
-              {avgHistorico}
-            </p>
-          </div>
-
-          {/* Torneos */}
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "1rem",
-              padding: "1.5rem",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-              borderLeft: "6px solid rgb(14, 165, 233)",
-              animation: "slideUp 0.5s ease-out 0.5s both",
-            }}
-          >
-            <p
-              style={{
-                color: "rgb(100, 116, 139)",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Torneos
-            </p>
-            <p
-              style={{
-                fontSize: "2rem",
-                fontWeight: "bold",
-                color: "rgb(14, 165, 233)",
-              }}
-            >
-              {torneos}
-            </p>
+              <div
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: "1rem",
+                  padding: "1rem 1.25rem",
+                  border: "1px solid rgb(226, 232, 240)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <p style={{ margin: 0, fontWeight: "600", color: "rgb(51, 65, 85)" }}>
+                  Verificado
+                </p>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    color: verified ? "rgb(34, 197, 94)" : "rgb(148, 163, 184)",
+                    fontWeight: "600",
+                  }}
+                >
+                  {verified ? (
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                  <span>{verified ? "Verificado" : "No verificado"}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
