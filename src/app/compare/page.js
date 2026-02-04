@@ -235,13 +235,12 @@ export default function ComparePage() {
 
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "1rem",
+            display: "flex",
+            justifyContent: "center",
             marginBottom: "2rem",
           }}
         >
-          <div>
+          <div style={{ minWidth: "220px" }}>
             <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "rgb(51, 65, 85)" }}>
               Género
             </label>
@@ -254,38 +253,6 @@ export default function ComparePage() {
               <option value="femenino">Femenino ♀</option>
             </select>
           </div>
-          <div>
-            <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "rgb(51, 65, 85)" }}>
-              Jugador izquierda
-            </label>
-            <select
-              value={leftPlayerName}
-              onChange={(e) => setLeftPlayerName(e.target.value)}
-              style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem" }}
-            >
-              {players.map((p) => (
-                <option key={p.NAME} value={p.NAME}>
-                  {p.NAME}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "rgb(51, 65, 85)" }}>
-              Jugador derecha
-            </label>
-            <select
-              value={rightPlayerName}
-              onChange={(e) => setRightPlayerName(e.target.value)}
-              style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem" }}
-            >
-              {players.map((p) => (
-                <option key={p.NAME} value={p.NAME}>
-                  {p.NAME}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
         {loading ? (
@@ -293,7 +260,50 @@ export default function ComparePage() {
             Cargando jugadores...
           </div>
         ) : (
-          <div style={{ marginBottom: "2rem" }}>
+          <div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                gap: "2rem",
+              }}
+            >
+              <div>
+                <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "rgb(51, 65, 85)" }}>
+                  Jugador izquierda
+                </label>
+                <select
+                  value={leftPlayerName}
+                  onChange={(e) => setLeftPlayerName(e.target.value)}
+                  style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem", marginBottom: "1rem" }}
+                >
+                  {players.map((p) => (
+                    <option key={p.NAME} value={p.NAME}>
+                      {p.NAME}
+                    </option>
+                  ))}
+                </select>
+                {renderPlayerCard(leftPlayer, "Jugador izquierdo")}
+              </div>
+              <div>
+                <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "rgb(51, 65, 85)" }}>
+                  Jugador derecha
+                </label>
+                <select
+                  value={rightPlayerName}
+                  onChange={(e) => setRightPlayerName(e.target.value)}
+                  style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem", marginBottom: "1rem" }}
+                >
+                  {players.map((p) => (
+                    <option key={p.NAME} value={p.NAME}>
+                      {p.NAME}
+                    </option>
+                  ))}
+                </select>
+                {renderPlayerCard(rightPlayer, "Jugador derecho")}
+              </div>
+            </div>
+
             <div
               style={{
                 backgroundColor: "white",
@@ -301,30 +311,19 @@ export default function ComparePage() {
                 padding: "1.5rem",
                 boxShadow: "0 10px 20px -5px rgba(0, 0, 0, 0.1)",
                 textAlign: "center",
-                marginBottom: "2rem",
+                marginTop: "2rem",
               }}
             >
               <p style={{ margin: 0, color: "rgb(100, 116, 139)", fontWeight: "600" }}>
                 Promedio de ELO
               </p>
               <p style={{ margin: "0.5rem 0", fontSize: "2rem", fontWeight: "700", color: "rgb(6, 182, 212)" }}>
-                {averageElo !== null ? averageElo.toFixed(2) : "—"}
+                {averageElo !== null ? averageElo : "—"}
               </p>
               <p style={{ margin: 0, color: "rgb(51, 65, 85)", fontWeight: "600" }}>
                 Categoría: {tableLoading ? "Cargando..." : averageCategory}
               </p>
             </div>
-
-          <div
-            style={{
-              display: "flex",
-              gap: "2rem",
-              flexWrap: "wrap",
-            }}
-          >
-            {renderPlayerCard(leftPlayer, "Jugador izquierdo")}
-            {renderPlayerCard(rightPlayer, "Jugador derecho")}
-          </div>
           </div>
         )}
       </div>
