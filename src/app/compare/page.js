@@ -33,6 +33,8 @@ export default function ComparePage() {
   const [players, setPlayers] = useState([]);
   const [leftPlayerName, setLeftPlayerName] = useState("");
   const [rightPlayerName, setRightPlayerName] = useState("");
+  const [leftSearch, setLeftSearch] = useState("");
+  const [rightSearch, setRightSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [categoryTable, setCategoryTable] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
@@ -64,6 +66,8 @@ export default function ComparePage() {
         setPlayers(mapped);
         setLeftPlayerName(mapped[0]?.NAME || "");
         setRightPlayerName(mapped[1]?.NAME || "");
+        setLeftSearch("");
+        setRightSearch("");
         setLoading(false);
       })
       .catch(() => {
@@ -99,6 +103,18 @@ export default function ComparePage() {
     () => players.find((p) => p.NAME === rightPlayerName) || null,
     [players, rightPlayerName]
   );
+
+  const filteredLeftPlayers = useMemo(() => {
+    if (!leftSearch.trim()) return players;
+    const term = leftSearch.trim().toLowerCase();
+    return players.filter((p) => (p.NAME || "").toLowerCase().includes(term));
+  }, [players, leftSearch]);
+
+  const filteredRightPlayers = useMemo(() => {
+    if (!rightSearch.trim()) return players;
+    const term = rightSearch.trim().toLowerCase();
+    return players.filter((p) => (p.NAME || "").toLowerCase().includes(term));
+  }, [players, rightSearch]);
 
   const averageElo = useMemo(() => {
     if (!leftPlayer || !rightPlayer) return null;
@@ -253,12 +269,19 @@ export default function ComparePage() {
                 <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "rgb(51, 65, 85)" }}>
                   Jugador izquierda
                 </label>
+                <input
+                  type="text"
+                  value={leftSearch}
+                  onChange={(e) => setLeftSearch(e.target.value)}
+                  placeholder="Buscar jugador..."
+                  style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem", marginBottom: "0.5rem", border: "1px solid rgb(226, 232, 240)" }}
+                />
                 <select
                   value={leftPlayerName}
                   onChange={(e) => setLeftPlayerName(e.target.value)}
                   style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem", marginBottom: "1rem" }}
                 >
-                  {players.map((p) => (
+                  {filteredLeftPlayers.map((p) => (
                     <option key={p.NAME} value={p.NAME}>
                       {p.NAME}
                     </option>
@@ -270,12 +293,19 @@ export default function ComparePage() {
                 <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "rgb(51, 65, 85)" }}>
                   Jugador derecha
                 </label>
+                <input
+                  type="text"
+                  value={rightSearch}
+                  onChange={(e) => setRightSearch(e.target.value)}
+                  placeholder="Buscar jugador..."
+                  style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem", marginBottom: "0.5rem", border: "1px solid rgb(226, 232, 240)" }}
+                />
                 <select
                   value={rightPlayerName}
                   onChange={(e) => setRightPlayerName(e.target.value)}
                   style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem", marginBottom: "1rem" }}
                 >
-                  {players.map((p) => (
+                  {filteredRightPlayers.map((p) => (
                     <option key={p.NAME} value={p.NAME}>
                       {p.NAME}
                     </option>
