@@ -21,6 +21,13 @@ const getColumnValue = (row, index) => {
   return "";
 };
 
+const parseEloValue = (value) => {
+  if (value === null || value === undefined) return 0;
+  const digitsOnly = String(value).replace(/[^0-9]/g, "");
+  const parsed = parseInt(digitsOnly, 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
 export default function HomePageClient() {
   const searchParams = useSearchParams();
   const [gender, setGender] = useState("masculino");
@@ -101,7 +108,7 @@ export default function HomePageClient() {
             return {
               NAME: name,
               CATEGORY: categoryValue,
-              ELO: parseFloat(eloValue) || 0,
+              ELO: parseEloValue(eloValue),
               ELO_DISPLAY: eloValue,
               FOTO: photoValue,
               gender,

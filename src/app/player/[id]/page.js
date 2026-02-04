@@ -32,6 +32,13 @@ const getColumnValue = (row, index) => {
   return "";
 };
 
+const parseEloValue = (value) => {
+  if (value === null || value === undefined) return 0;
+  const digitsOnly = String(value).replace(/[^0-9]/g, "");
+  const parsed = parseInt(digitsOnly, 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
 const RADAR_FALLBACK_LABELS = ["K", "L", "M", "N", "O", "P", "Q"];
 
 export default function PlayerPageClient() {
@@ -79,7 +86,7 @@ export default function PlayerPageClient() {
           return {
             NAME: name,
             CATEGORY: categoryValue,
-            ELO: parseFloat(eloValue) || 0,
+            ELO: parseEloValue(eloValue),
             ELO_DISPLAY: eloValue,
             FOTO: photoValue,
             TOURNAMENTS: tournaments,

@@ -21,6 +21,13 @@ const getColumnValue = (row, index) => {
   return "";
 };
 
+const parseEloValue = (value) => {
+  if (value === null || value === undefined) return 0;
+  const digitsOnly = String(value).replace(/[^0-9]/g, "");
+  const parsed = parseInt(digitsOnly, 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
 export default function ComparePage() {
   const [gender, setGender] = useState("masculino");
   const [players, setPlayers] = useState([]);
@@ -46,7 +53,7 @@ export default function ComparePage() {
             const photoValue = getColumnValue(row, COLUMN_INDEX.PHOTO);
             return {
               NAME: name,
-              ELO: parseFloat(eloValue) || 0,
+              ELO: parseEloValue(eloValue),
               ELO_DISPLAY: eloValue,
               FOTO: photoValue,
               _raw: row,
