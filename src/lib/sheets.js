@@ -142,3 +142,10 @@ export async function fetchGames(gid = GAMES_SHEET_GID) {
   const url = buildCsvUrl(gid);
   return await parseCsvUrl(url);
 }
+
+// Fetch de la tabla de categorías por ELO
+export async function fetchCategoryTable(gid) {
+  if (!gid) return [];
+  const url = buildCsvUrl(gid);
+  return await parseCsvUrl(url);
+}
