@@ -63,9 +63,21 @@ export default function ComparePage() {
           })
           .filter((p) => p.NAME && p.NAME.trim() !== "");
 
-        setPlayers(mapped);
-        setLeftPlayerName(mapped[0]?.NAME || "");
-        setRightPlayerName(mapped[1]?.NAME || "");
+        const uniqueByName = new Map();
+        mapped.forEach((p) => {
+          const key = p.NAME.trim();
+          if (!uniqueByName.has(key)) {
+            uniqueByName.set(key, p);
+          }
+        });
+
+        const uniquePlayers = Array.from(uniqueByName.values()).sort((a, b) =>
+          a.NAME.localeCompare(b.NAME)
+        );
+
+        setPlayers(uniquePlayers);
+        setLeftPlayerName(uniquePlayers[0]?.NAME || "");
+        setRightPlayerName(uniquePlayers[1]?.NAME || "");
         setLeftSearch("");
         setRightSearch("");
         setLoading(false);
