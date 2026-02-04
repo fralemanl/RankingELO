@@ -128,6 +128,22 @@ export default function ComparePage() {
     return players.filter((p) => (p.NAME || "").toLowerCase().includes(term));
   }, [players, rightSearch]);
 
+  useEffect(() => {
+    if (!filteredLeftPlayers.length) return;
+    const exists = filteredLeftPlayers.some((p) => p.NAME === leftPlayerName);
+    if (!exists) {
+      setLeftPlayerName(filteredLeftPlayers[0].NAME);
+    }
+  }, [filteredLeftPlayers, leftPlayerName]);
+
+  useEffect(() => {
+    if (!filteredRightPlayers.length) return;
+    const exists = filteredRightPlayers.some((p) => p.NAME === rightPlayerName);
+    if (!exists) {
+      setRightPlayerName(filteredRightPlayers[0].NAME);
+    }
+  }, [filteredRightPlayers, rightPlayerName]);
+
   const averageElo = useMemo(() => {
     if (!leftPlayer || !rightPlayer) return null;
     const left = parseFloat(leftPlayer.ELO) || 0;
