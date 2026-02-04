@@ -109,40 +109,14 @@ export default function ComparePage() {
 
   const resolveCategory = (elo) => {
     if (elo === null || Number.isNaN(elo)) return "—";
-    const rows = categoryTable || [];
-    if (rows.length === 0) return "—";
 
-    const getCell = (row, idx) => {
-      if (!row) return "";
-      if (Array.isArray(row)) return row[idx] || "";
-      if (row.__values) return row.__values[idx] || "";
-      return "";
-    };
-
-    const pickValue = (row, keys, fallbackIdx) => {
-      for (const key of keys) {
-        const value = row?.[key];
-        if (value !== undefined && value !== null && String(value).trim() !== "") {
-          return value;
-        }
-      }
-      return getCell(row, fallbackIdx);
-    };
-
-    for (const row of rows) {
-      const minRaw = pickValue(row, ["MIN", "Min", "min", "DESDE", "Desde", "desde", "INICIO", "Inicio"], 0);
-      const maxRaw = pickValue(row, ["MAX", "Max", "max", "HASTA", "Hasta", "hasta", "FIN", "Fin"], 1);
-      const catRaw = pickValue(row, ["CATEGORIA", "Categoria", "category", "CATEGORY", "Nivel", "NIVEL"], 2);
-
-      const min = parseFloat(String(minRaw).replace(/,/g, "."));
-      const max = parseFloat(String(maxRaw).replace(/,/g, "."));
-
-      if (!Number.isNaN(min) && !Number.isNaN(max)) {
-        if (elo >= min && elo <= max) {
-          return catRaw || "—";
-        }
-      }
-    }
+    if (elo >= 2200) return "1ra";
+    if (elo >= 2000) return "2da";
+    if (elo >= 1800) return "3ra";
+    if (elo >= 1600) return "4ta";
+    if (elo >= 1400) return "5ta";
+    if (elo >= 1200) return "6ta";
+    if (elo >= 1000) return "7ma";
 
     return "—";
   };
