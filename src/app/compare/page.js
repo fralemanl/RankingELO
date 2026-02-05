@@ -11,6 +11,7 @@ import {
 const COLUMN_INDEX = {
   NAME: 1, // B
   ELO: 3, // D
+  CATEGORY: 4, // E
   PHOTO: 17, // R
 };
 
@@ -35,6 +36,8 @@ export default function ComparePage() {
   const [rightPlayerName, setRightPlayerName] = useState("");
   const [leftSearch, setLeftSearch] = useState("");
   const [rightSearch, setRightSearch] = useState("");
+  const [leftCategorySearch, setLeftCategorySearch] = useState("");
+  const [rightCategorySearch, setRightCategorySearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [categoryTable, setCategoryTable] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
@@ -52,11 +55,13 @@ export default function ComparePage() {
           .map((row) => {
             const name = getColumnValue(row, COLUMN_INDEX.NAME);
             const eloValue = getColumnValue(row, COLUMN_INDEX.ELO);
+            const categoryValue = getColumnValue(row, COLUMN_INDEX.CATEGORY);
             const photoValue = getColumnValue(row, COLUMN_INDEX.PHOTO);
             return {
               NAME: name,
               ELO: parseEloValue(eloValue),
               ELO_DISPLAY: eloValue,
+              CATEGORY: categoryValue,
               FOTO: photoValue,
               _raw: row,
             };
@@ -80,6 +85,8 @@ export default function ComparePage() {
         setRightPlayerName(uniquePlayers[1]?.NAME || "");
         setLeftSearch("");
         setRightSearch("");
+        setLeftCategorySearch("");
+        setRightCategorySearch("");
         setLoading(false);
       })
       .catch(() => {
@@ -117,16 +124,34 @@ export default function ComparePage() {
   );
 
   const filteredLeftPlayers = useMemo(() => {
-    if (!leftSearch.trim()) return players;
-    const term = leftSearch.trim().toLowerCase();
-    return players.filter((p) => (p.NAME || "").toLowerCase().includes(term));
-  }, [players, leftSearch]);
+    const nameTerm = leftSearch.trim().toLowerCase();
+    const categoryTerm = leftCategorySearch.trim().toLowerCase();
+    if (!nameTerm && !categoryTerm) return players;
+    return players.filter((p) => {
+      const nameMatch = nameTerm
+        ? (p.NAME || "").toLowerCase().includes(nameTerm)
+        : true;
+      const categoryMatch = categoryTerm
+        ? (p.CATEGORY || "").toLowerCase().includes(categoryTerm)
+        : true;
+      return nameMatch && categoryMatch;
+    });
+  }, [players, leftSearch, leftCategorySearch]);
 
   const filteredRightPlayers = useMemo(() => {
-    if (!rightSearch.trim()) return players;
-    const term = rightSearch.trim().toLowerCase();
-    return players.filter((p) => (p.NAME || "").toLowerCase().includes(term));
-  }, [players, rightSearch]);
+    const nameTerm = rightSearch.trim().toLowerCase();
+    const categoryTerm = rightCategorySearch.trim().toLowerCase();
+    if (!nameTerm && !categoryTerm) return players;
+    return players.filter((p) => {
+      const nameMatch = nameTerm
+        ? (p.NAME || "").toLowerCase().includes(nameTerm)
+        : true;
+      const categoryMatch = categoryTerm
+        ? (p.CATEGORY || "").toLowerCase().includes(categoryTerm)
+        : true;
+      return nameMatch && categoryMatch;
+    });
+  }, [players, rightSearch, rightCategorySearch]);
 
   useEffect(() => {
     if (!filteredLeftPlayers.length) return;
@@ -167,16 +192,38 @@ export default function ComparePage() {
 
   const averageCategory = useMemo(() => resolveCategory(averageElo), [averageElo, categoryTable]);
 
+  const globalRankMap = useMemo(() => {
+    const sorted = [...players].sort((a, b) => (b.ELO || 0) - (a.ELO || 0));
+    const map = new Map();
+    sorted.forEach((p, index) => map.set(p.NAME, index + 1));
+    return map;
+  }, [players]);
+
+  const categoryRankMap = useMemo(() => {
+    const map = new Map();
+    const grouped = new Map();
+    players.forEach((p) => {
+      const key = (p.CATEGORY || "").trim();
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key).push(p);
+    });
+
+    grouped.forEach((group) => {
+      group.sort((a, b) => (b.ELO || 0) - (a.ELO || 0));
+      group.forEach((p, index) => map.set(p.NAME, index + 1));
+    });
+
+    return map;
+  }, [players]);
+
   const renderPlayerCard = (player, positionLabel) => {
     if (!player) {
       return (
         <div style={{
-          flex: 1,
-          backgroundColor: "white",
-          borderRadius: "1rem",
-          padding: "2rem",
+          backgroundColor: "#f0f0f0",
+          borderRadius: "0.5rem",
+          padding: "1.5rem",
           textAlign: "center",
-          boxShadow: "0 10px 20px -5px rgba(0, 0, 0, 0.1)",
         }}>
           <p style={{ color: "rgb(100, 116, 139)" }}>Selecciona un jugador</p>
         </div>
@@ -189,57 +236,112 @@ export default function ComparePage() {
       buildGoogleDriveThumbnailUrl(fotoValue, 400);
 
     return (
-      <div
-        style={{
-          flex: 1,
-          backgroundColor: "white",
-          borderRadius: "1rem",
-          padding: "2rem",
-          textAlign: "center",
-          boxShadow: "0 10px 20px -5px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <p style={{
-          margin: 0,
-          color: "rgb(100, 116, 139)",
-          fontSize: "0.85rem",
-          fontWeight: "600",
-          textTransform: "uppercase",
-          letterSpacing: "0.08em",
-        }}>
-          {positionLabel}
-        </p>
-        {fotoSrc && (
-          <img
-            src={fotoSrc}
-            alt={player.NAME}
-            style={{
-              width: "220px",
-              height: "300px",
-              objectFit: "cover",
-              borderRadius: "0.75rem",
-              border: "3px solid rgb(6, 182, 212)",
-              boxShadow: "0 10px 25px -5px rgba(6, 182, 212, 0.3)",
-              marginTop: "1.5rem",
-            }}
-            referrerPolicy="no-referrer"
-            onError={(e) => {
-              const thumb = buildGoogleDriveThumbnailUrl(fotoValue, 400);
-              if (thumb && e.currentTarget.src !== thumb) {
-                e.currentTarget.src = thumb;
-                return;
-              }
-              e.currentTarget.onerror = null;
-              e.currentTarget.style.display = "none";
-            }}
-          />
-        )}
-        <h3 style={{ marginTop: "1.5rem", marginBottom: "0.5rem", fontSize: "1.5rem" }}>
-          {player.NAME}
-        </h3>
-        <p style={{ margin: 0, fontSize: "1.25rem", fontWeight: "600", color: "rgb(6, 182, 212)" }}>
+      <div>
+        <div
+          style={{
+            backgroundColor: "#4a6cf7",
+            borderRadius: "0.75rem",
+            padding: "0.75rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "0.75rem",
+          }}
+        >
+          {fotoSrc ? (
+            <img
+              src={fotoSrc}
+              alt={player.NAME}
+              style={{
+                width: "180px",
+                height: "220px",
+                objectFit: "cover",
+                borderRadius: "0.75rem",
+              }}
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                const thumb = buildGoogleDriveThumbnailUrl(fotoValue, 400);
+                if (thumb && e.currentTarget.src !== thumb) {
+                  e.currentTarget.src = thumb;
+                  return;
+                }
+                e.currentTarget.onerror = null;
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          ) : (
+            <div style={{ color: "white", fontWeight: "600" }}>FOTO</div>
+          )}
+        </div>
+
+        <div
+          style={{
+            backgroundColor: "#4a6cf7",
+            color: "white",
+            padding: "0.5rem",
+            borderRadius: "0.5rem",
+            textAlign: "center",
+            fontWeight: "600",
+            marginBottom: "0.5rem",
+          }}
+        >
           ELO: {player.ELO_DISPLAY || player.ELO || 0}
-        </p>
+        </div>
+
+        <div
+          style={{
+            backgroundColor: "#4a6cf7",
+            color: "white",
+            padding: "0.5rem",
+            borderRadius: "0.5rem",
+            textAlign: "center",
+            fontWeight: "600",
+            marginBottom: "0.5rem",
+          }}
+        >
+          CATEGORIA: {player.CATEGORY || "—"}
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: "0.5rem",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#4a6cf7",
+              color: "white",
+              padding: "0.5rem",
+              borderRadius: "0.5rem",
+              textAlign: "center",
+              fontWeight: "600",
+              fontSize: "0.85rem",
+            }}
+          >
+            POSICION GLOBAL
+            <div style={{ fontSize: "1rem", marginTop: "0.25rem" }}>
+              #{globalRankMap.get(player.NAME) || "—"}
+            </div>
+          </div>
+          <div
+            style={{
+              backgroundColor: "#4a6cf7",
+              color: "white",
+              padding: "0.5rem",
+              borderRadius: "0.5rem",
+              textAlign: "center",
+              fontWeight: "600",
+              fontSize: "0.85rem",
+            }}
+          >
+            POSICION CATEGORIA
+            <div style={{ fontSize: "1rem", marginTop: "0.25rem" }}>
+              #{categoryRankMap.get(player.NAME) || "—"}
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
@@ -254,9 +356,21 @@ export default function ComparePage() {
       }}
     >
       <div style={{ maxWidth: "80rem", margin: "0 auto" }}>
-        <h1 style={{ fontSize: "2rem", fontWeight: "700", marginBottom: "1.5rem" }}>
-          Comparar Jugadores
-        </h1>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}>
+          <button
+            type="button"
+            style={{
+              padding: "0.5rem 1.5rem",
+              backgroundColor: "#e2e2e2",
+              borderRadius: "0.25rem",
+              border: "1px solid #cfcfcf",
+              fontWeight: "700",
+              letterSpacing: "0.08em",
+            }}
+          >
+            GENERO
+          </button>
+        </div>
 
         <div
           style={{
@@ -266,13 +380,10 @@ export default function ComparePage() {
           }}
         >
           <div style={{ minWidth: "220px" }}>
-            <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "rgb(51, 65, 85)" }}>
-              Género
-            </label>
             <select
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem" }}
+              style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem" }}
             >
               <option value="masculino">Masculino ♂</option>
               <option value="femenino">Femenino ♀</option>
@@ -294,20 +405,64 @@ export default function ComparePage() {
               }}
             >
               <div>
-                <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "rgb(51, 65, 85)" }}>
-                  Jugador izquierda
-                </label>
-                <input
-                  type="text"
-                  value={leftSearch}
-                  onChange={(e) => setLeftSearch(e.target.value)}
-                  placeholder="Buscar jugador..."
-                  style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem", marginBottom: "0.5rem", border: "1px solid rgb(226, 232, 240)" }}
-                />
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                    gap: "0.5rem",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: "#e2e2e2",
+                      textAlign: "center",
+                      padding: "0.4rem",
+                      fontWeight: "700",
+                    }}
+                  >
+                    NOMBRE
+                  </div>
+                  <div
+                    style={{
+                      backgroundColor: "#e2e2e2",
+                      textAlign: "center",
+                      padding: "0.4rem",
+                      fontWeight: "700",
+                    }}
+                  >
+                    CATEGORIA
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                    gap: "0.5rem",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={leftSearch}
+                    onChange={(e) => setLeftSearch(e.target.value)}
+                    placeholder="Buscar nombre"
+                    style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", border: "1px solid #cfcfcf" }}
+                  />
+                  <input
+                    type="text"
+                    value={leftCategorySearch}
+                    onChange={(e) => setLeftCategorySearch(e.target.value)}
+                    placeholder="Buscar categoría"
+                    style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", border: "1px solid #cfcfcf" }}
+                  />
+                </div>
+
                 <select
                   value={leftPlayerName}
                   onChange={(e) => setLeftPlayerName(e.target.value)}
-                  style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem", marginBottom: "1rem" }}
+                  style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", marginBottom: "1rem" }}
                 >
                   {filteredLeftPlayers.map((p) => (
                     <option key={p.NAME} value={p.NAME}>
@@ -318,20 +473,64 @@ export default function ComparePage() {
                 {renderPlayerCard(leftPlayer, "Jugador izquierdo")}
               </div>
               <div>
-                <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "rgb(51, 65, 85)" }}>
-                  Jugador derecha
-                </label>
-                <input
-                  type="text"
-                  value={rightSearch}
-                  onChange={(e) => setRightSearch(e.target.value)}
-                  placeholder="Buscar jugador..."
-                  style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem", marginBottom: "0.5rem", border: "1px solid rgb(226, 232, 240)" }}
-                />
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                    gap: "0.5rem",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: "#e2e2e2",
+                      textAlign: "center",
+                      padding: "0.4rem",
+                      fontWeight: "700",
+                    }}
+                  >
+                    NOMBRE
+                  </div>
+                  <div
+                    style={{
+                      backgroundColor: "#e2e2e2",
+                      textAlign: "center",
+                      padding: "0.4rem",
+                      fontWeight: "700",
+                    }}
+                  >
+                    CATEGORIA
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                    gap: "0.5rem",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={rightSearch}
+                    onChange={(e) => setRightSearch(e.target.value)}
+                    placeholder="Buscar nombre"
+                    style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", border: "1px solid #cfcfcf" }}
+                  />
+                  <input
+                    type="text"
+                    value={rightCategorySearch}
+                    onChange={(e) => setRightCategorySearch(e.target.value)}
+                    placeholder="Buscar categoría"
+                    style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", border: "1px solid #cfcfcf" }}
+                  />
+                </div>
+
                 <select
                   value={rightPlayerName}
                   onChange={(e) => setRightPlayerName(e.target.value)}
-                  style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem", marginBottom: "1rem" }}
+                  style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", marginBottom: "1rem" }}
                 >
                   {filteredRightPlayers.map((p) => (
                     <option key={p.NAME} value={p.NAME}>
@@ -345,23 +544,33 @@ export default function ComparePage() {
 
             <div
               style={{
-                backgroundColor: "white",
-                borderRadius: "1rem",
-                padding: "1.5rem",
-                boxShadow: "0 10px 20px -5px rgba(0, 0, 0, 0.1)",
-                textAlign: "center",
+                display: "grid",
+                gap: "1rem",
                 marginTop: "2rem",
               }}
             >
-              <p style={{ margin: 0, color: "rgb(100, 116, 139)", fontWeight: "600" }}>
-                Promedio de ELO
-              </p>
-              <p style={{ margin: "0.5rem 0", fontSize: "2rem", fontWeight: "700", color: "rgb(6, 182, 212)" }}>
-                {averageElo !== null ? averageElo : "—"}
-              </p>
-              <p style={{ margin: 0, color: "rgb(51, 65, 85)", fontWeight: "600" }}>
-                Categoría: {tableLoading ? "Cargando..." : averageCategory}
-              </p>
+              <div
+                style={{
+                  backgroundColor: "#e2e2e2",
+                  borderRadius: "0.25rem",
+                  padding: "1rem",
+                  textAlign: "center",
+                  fontWeight: "700",
+                }}
+              >
+                ELO PROMEDIO: {averageElo !== null ? averageElo : "—"}
+              </div>
+              <div
+                style={{
+                  backgroundColor: "#e2e2e2",
+                  borderRadius: "0.25rem",
+                  padding: "1rem",
+                  textAlign: "center",
+                  fontWeight: "700",
+                }}
+              >
+                CATEGORIA SUGERIDA: {tableLoading ? "Cargando..." : averageCategory}
+              </div>
             </div>
           </div>
         )}
