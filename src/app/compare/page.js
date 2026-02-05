@@ -36,8 +36,8 @@ export default function ComparePage() {
   const [rightPlayerName, setRightPlayerName] = useState("");
   const [leftSearch, setLeftSearch] = useState("");
   const [rightSearch, setRightSearch] = useState("");
-  const [leftCategorySearch, setLeftCategorySearch] = useState("");
-  const [rightCategorySearch, setRightCategorySearch] = useState("");
+  const [leftCategorySearch, setLeftCategorySearch] = useState("all");
+  const [rightCategorySearch, setRightCategorySearch] = useState("all");
   const [loading, setLoading] = useState(true);
   const [categoryTable, setCategoryTable] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
@@ -85,8 +85,8 @@ export default function ComparePage() {
         setRightPlayerName(uniquePlayers[1]?.NAME || "");
         setLeftSearch("");
         setRightSearch("");
-        setLeftCategorySearch("");
-        setRightCategorySearch("");
+        setLeftCategorySearch("all");
+        setRightCategorySearch("all");
         setLoading(false);
       })
       .catch(() => {
@@ -126,14 +126,14 @@ export default function ComparePage() {
   const filteredLeftPlayers = useMemo(() => {
     const nameTerm = leftSearch.trim().toLowerCase();
     const categoryTerm = leftCategorySearch.trim().toLowerCase();
-    if (!nameTerm && !categoryTerm) return players;
+    if (!nameTerm && (categoryTerm === "all" || !categoryTerm)) return players;
     return players.filter((p) => {
       const nameMatch = nameTerm
         ? (p.NAME || "").toLowerCase().includes(nameTerm)
         : true;
-      const categoryMatch = categoryTerm
-        ? (p.CATEGORY || "").toLowerCase().includes(categoryTerm)
-        : true;
+      const categoryMatch = categoryTerm === "all"
+        ? true
+        : (p.CATEGORY || "").toLowerCase().includes(categoryTerm);
       return nameMatch && categoryMatch;
     });
   }, [players, leftSearch, leftCategorySearch]);
@@ -141,14 +141,14 @@ export default function ComparePage() {
   const filteredRightPlayers = useMemo(() => {
     const nameTerm = rightSearch.trim().toLowerCase();
     const categoryTerm = rightCategorySearch.trim().toLowerCase();
-    if (!nameTerm && !categoryTerm) return players;
+    if (!nameTerm && (categoryTerm === "all" || !categoryTerm)) return players;
     return players.filter((p) => {
       const nameMatch = nameTerm
         ? (p.NAME || "").toLowerCase().includes(nameTerm)
         : true;
-      const categoryMatch = categoryTerm
-        ? (p.CATEGORY || "").toLowerCase().includes(categoryTerm)
-        : true;
+      const categoryMatch = categoryTerm === "all"
+        ? true
+        : (p.CATEGORY || "").toLowerCase().includes(categoryTerm);
       return nameMatch && categoryMatch;
     });
   }, [players, rightSearch, rightCategorySearch]);
@@ -450,13 +450,20 @@ export default function ComparePage() {
                     placeholder="Buscar nombre"
                     style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", border: "1px solid #cfcfcf" }}
                   />
-                  <input
-                    type="text"
+                  <select
                     value={leftCategorySearch}
                     onChange={(e) => setLeftCategorySearch(e.target.value)}
-                    placeholder="Buscar categoría"
-                    style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", border: "1px solid #cfcfcf" }}
-                  />
+                    style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem" }}
+                  >
+                    <option value="all">Todas</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                  </select>
                 </div>
 
                 <select
@@ -518,13 +525,20 @@ export default function ComparePage() {
                     placeholder="Buscar nombre"
                     style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", border: "1px solid #cfcfcf" }}
                   />
-                  <input
-                    type="text"
+                  <select
                     value={rightCategorySearch}
                     onChange={(e) => setRightCategorySearch(e.target.value)}
-                    placeholder="Buscar categoría"
-                    style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", border: "1px solid #cfcfcf" }}
-                  />
+                    style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem" }}
+                  >
+                    <option value="all">Todas</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                  </select>
                 </div>
 
                 <select
