@@ -41,6 +41,7 @@ export default function ComparePage() {
   const [loading, setLoading] = useState(true);
   const [categoryTable, setCategoryTable] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
+  const [calculated, setCalculated] = useState(false);
 
   const CATEGORY_TABLE_GID = "639425194";
 
@@ -81,12 +82,13 @@ export default function ComparePage() {
         );
 
         setPlayers(uniquePlayers);
-        setLeftPlayerName(uniquePlayers[0]?.NAME || "");
-        setRightPlayerName(uniquePlayers[1]?.NAME || "");
+        setLeftPlayerName("");
+        setRightPlayerName("");
         setLeftSearch("");
         setRightSearch("");
         setLeftCategorySearch("all");
         setRightCategorySearch("all");
+        setCalculated(false);
         setLoading(false);
       })
       .catch(() => {
@@ -154,27 +156,15 @@ export default function ComparePage() {
   }, [players, rightSearch, rightCategorySearch]);
 
   useEffect(() => {
-    if (!filteredLeftPlayers.length) return;
-    const exists = filteredLeftPlayers.some((p) => p.NAME === leftPlayerName);
-    if (!exists) {
-      setLeftPlayerName(filteredLeftPlayers[0].NAME);
-    }
-  }, [filteredLeftPlayers, leftPlayerName]);
-
-  useEffect(() => {
-    if (!filteredRightPlayers.length) return;
-    const exists = filteredRightPlayers.some((p) => p.NAME === rightPlayerName);
-    if (!exists) {
-      setRightPlayerName(filteredRightPlayers[0].NAME);
-    }
-  }, [filteredRightPlayers, rightPlayerName]);
+    if (calculated) setCalculated(false);
+  }, [leftPlayerName, rightPlayerName, gender]);
 
   const averageElo = useMemo(() => {
-    if (!leftPlayer || !rightPlayer) return null;
+    if (!calculated || !leftPlayer || !rightPlayer) return null;
     const left = parseFloat(leftPlayer.ELO) || 0;
     const right = parseFloat(rightPlayer.ELO) || 0;
     return (left + right) / 2;
-  }, [leftPlayer, rightPlayer]);
+  }, [leftPlayer, rightPlayer, calculated]);
 
   const resolveCategory = (elo) => {
     if (elo === null || Number.isNaN(elo)) return "—";
@@ -471,6 +461,7 @@ export default function ComparePage() {
                   onChange={(e) => setLeftPlayerName(e.target.value)}
                   style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", marginBottom: "1rem" }}
                 >
+                  <option value="">Seleccionar jugador</option>
                   {filteredLeftPlayers.map((p) => (
                     <option key={p.NAME} value={p.NAME}>
                       {p.NAME}
@@ -546,6 +537,7 @@ export default function ComparePage() {
                   onChange={(e) => setRightPlayerName(e.target.value)}
                   style={{ width: "100%", padding: "0.5rem", borderRadius: "0.25rem", marginBottom: "1rem" }}
                 >
+                  <option value="">Seleccionar jugador</option>
                   {filteredRightPlayers.map((p) => (
                     <option key={p.NAME} value={p.NAME}>
                       {p.NAME}
@@ -556,36 +548,65 @@ export default function ComparePage() {
               </div>
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gap: "1rem",
-                marginTop: "2rem",
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: "#e2e2e2",
-                  borderRadius: "0.25rem",
-                  padding: "1rem",
-                  textAlign: "center",
-                  fontWeight: "700",
+            <div style={{ display: "flex", justifyContent: "center", marginTop: "1.5rem" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (leftPlayer && rightPlayer) {
+                    setCalculated(true);
+                  }
                 }}
-              >
-                ELO PROMEDIO: {averageElo !== null ? averageElo : "—"}
-              </div>
-              <div
                 style={{
-                  backgroundColor: "#e2e2e2",
-                  borderRadius: "0.25rem",
-                  padding: "1rem",
-                  textAlign: "center",
+                  padding: "0.6rem 2rem",
+                  backgroundColor: "#4a6cf7",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "0.5rem",
                   fontWeight: "700",
+                  letterSpacing: "0.08em",
+                  cursor: leftPlayer && rightPlayer ? "pointer" : "not-allowed",
+                  opacity: leftPlayer && rightPlayer ? 1 : 0.6,
                 }}
+                disabled={!leftPlayer || !rightPlayer}
               >
-                CATEGORIA SUGERIDA: {tableLoading ? "Cargando..." : averageCategory}
-              </div>
+                CALCULAR
+              </button>
             </div>
+
+            {calculated && (
+              <div
+                style={{
+                  display: "grid",
+                  gap: "1rem",
+                  marginTop: "2rem",
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: "#e2e2e2",
+                    borderRadius: "0.25rem",
+                    padding: "1rem",
+                    textAlign: "center",
+                    fontWeight: "700",
+                    fontSize: "2.25rem",
+                  }}
+                >
+                  ELO PROMEDIO: {averageElo !== null ? averageElo : "—"}
+                </div>
+                <div
+                  style={{
+                    backgroundColor: "#e2e2e2",
+                    borderRadius: "0.25rem",
+                    padding: "1rem",
+                    textAlign: "center",
+                    fontWeight: "700",
+                    fontSize: "2.25rem",
+                  }}
+                >
+                  CATEGORIA SUGERIDA: {tableLoading ? "Cargando..." : averageCategory}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
