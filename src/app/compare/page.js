@@ -355,7 +355,7 @@ export default function ComparePage() {
         padding: "2.5rem 1rem",
       }}
     >
-      <div style={{ maxWidth: "80rem", margin: "0 auto" }}>
+      <div style={{ maxWidth: "62rem", margin: "0 auto" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}>
           <button
             type="button"
@@ -408,7 +408,7 @@ export default function ComparePage() {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                    gridTemplateColumns: "2fr 1fr",
                     gap: "0.5rem",
                     marginBottom: "0.5rem",
                   }}
@@ -438,7 +438,7 @@ export default function ComparePage() {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                    gridTemplateColumns: "2fr 1fr",
                     gap: "0.5rem",
                     marginBottom: "0.5rem",
                   }}
@@ -483,7 +483,7 @@ export default function ComparePage() {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                    gridTemplateColumns: "2fr 1fr",
                     gap: "0.5rem",
                     marginBottom: "0.5rem",
                   }}
@@ -513,7 +513,7 @@ export default function ComparePage() {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                    gridTemplateColumns: "2fr 1fr",
                     gap: "0.5rem",
                     marginBottom: "0.5rem",
                   }}
