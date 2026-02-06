@@ -176,7 +176,9 @@ export default function RankingTable({ players, allPlayers = [], category }) {
                     <span style={{ color: "rgb(100, 116, 139)" }}>
                       {categoryRank}
                     </span>
-                    {medal && <span style={{ fontSize: "1.5rem" }}>{medal}</span>}
+                    {medal && (
+                      <span style={{ fontSize: "1.5rem" }}>{medal}</span>
+                    )}
                   </div>
                 </td>
                 <td style={tableStyles.td}>
@@ -190,7 +192,7 @@ export default function RankingTable({ players, allPlayers = [], category }) {
                         onError={(e) => {
                           const thumb = buildGoogleDriveThumbnailUrl(
                             fotoValue,
-                            120
+                            120,
                           );
                           if (thumb && e.currentTarget.src !== thumb) {
                             e.currentTarget.src = thumb;
@@ -203,12 +205,10 @@ export default function RankingTable({ players, allPlayers = [], category }) {
                     )}
                     <Link
                       href={`/player/${encodeURIComponent(
-                        player.NAME
+                        player.NAME,
                       )}?gender=${encodeURIComponent(
-                        player.gender
-                      )}&category=${encodeURIComponent(
-                        category || "all"
-                      )}`}
+                        player.gender,
+                      )}&category=${encodeURIComponent(category || "all")}`}
                       style={tableStyles.playerLink}
                       onMouseOver={(e) => {
                         e.currentTarget.style.color = "rgb(8, 145, 178)";

@@ -6,4 +6,3 @@ import EloPage from "../elo/page";
 export default function ComparePage() {
   return <EloPage />;
 }
-const COLUMN_INDEX = {

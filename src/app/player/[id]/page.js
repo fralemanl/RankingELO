@@ -76,8 +76,14 @@ export default function PlayerPageClient() {
           const verified = getColumnValue(row, COLUMN_INDEX.VERIFIED);
           const headers = row?.__headers || [];
           const radarStats = [];
-          for (let idx = COLUMN_INDEX.RADAR_START; idx <= COLUMN_INDEX.RADAR_END; idx += 1) {
-            const label = headers[idx] || RADAR_FALLBACK_LABELS[idx - COLUMN_INDEX.RADAR_START];
+          for (
+            let idx = COLUMN_INDEX.RADAR_START;
+            idx <= COLUMN_INDEX.RADAR_END;
+            idx += 1
+          ) {
+            const label =
+              headers[idx] ||
+              RADAR_FALLBACK_LABELS[idx - COLUMN_INDEX.RADAR_START];
             radarStats.push({
               stat: label || `Col ${idx + 1}`,
               value: parseFloat(getColumnValue(row, idx)) || 0,
@@ -236,7 +242,7 @@ export default function PlayerPageClient() {
       >
         <Link
           href={`/?gender=${encodeURIComponent(
-            gender
+            gender,
           )}&category=${encodeURIComponent(category)}`}
           style={{
             color: "rgb(6, 182, 212)",
@@ -397,7 +403,8 @@ export default function PlayerPageClient() {
             >
               <div
                 style={{
-                  background: "linear-gradient(135deg, rgb(6, 182, 212), rgb(14, 116, 144))",
+                  background:
+                    "linear-gradient(135deg, rgb(6, 182, 212), rgb(14, 116, 144))",
                   color: "white",
                   borderRadius: "1rem",
                   padding: "1.5rem",
@@ -412,7 +419,9 @@ export default function PlayerPageClient() {
                   <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.9 }}>
                     ELO
                   </p>
-                  <p style={{ margin: 0, fontSize: "2.5rem", fontWeight: "700" }}>
+                  <p
+                    style={{ margin: 0, fontSize: "2.5rem", fontWeight: "700" }}
+                  >
                     {eloDisplay}
                   </p>
                 </div>
@@ -427,7 +436,9 @@ export default function PlayerPageClient() {
                   <p style={{ margin: 0, fontSize: "0.75rem", opacity: 0.9 }}>
                     Ranking Global
                   </p>
-                  <p style={{ margin: 0, fontSize: "1.4rem", fontWeight: "700" }}>
+                  <p
+                    style={{ margin: 0, fontSize: "1.4rem", fontWeight: "700" }}
+                  >
                     #{globalRank}
                   </p>
                 </div>
@@ -449,34 +460,82 @@ export default function PlayerPageClient() {
                   }}
                 >
                   <div>
-                    <p style={{ margin: 0, color: "rgb(100, 116, 139)", fontSize: "0.8rem" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "rgb(100, 116, 139)",
+                        fontSize: "0.8rem",
+                      }}
+                    >
                       Torneos jugados
                     </p>
-                    <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: "700" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "1.5rem",
+                        fontWeight: "700",
+                      }}
+                    >
                       {torneos}
                     </p>
                   </div>
                   <div>
-                    <p style={{ margin: 0, color: "rgb(100, 116, 139)", fontSize: "0.8rem" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "rgb(100, 116, 139)",
+                        fontSize: "0.8rem",
+                      }}
+                    >
                       Partidos jugados
                     </p>
-                    <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: "700" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "1.5rem",
+                        fontWeight: "700",
+                      }}
+                    >
                       {partidos}
                     </p>
                   </div>
                   <div>
-                    <p style={{ margin: 0, color: "rgb(100, 116, 139)", fontSize: "0.8rem" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "rgb(100, 116, 139)",
+                        fontSize: "0.8rem",
+                      }}
+                    >
                       Partidos ganados
                     </p>
-                    <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: "700" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "1.5rem",
+                        fontWeight: "700",
+                      }}
+                    >
                       {ganados}
                     </p>
                   </div>
                   <div>
-                    <p style={{ margin: 0, color: "rgb(100, 116, 139)", fontSize: "0.8rem" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "rgb(100, 116, 139)",
+                        fontSize: "0.8rem",
+                      }}
+                    >
                       Efectividad
                     </p>
-                    <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: "700" }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "1.5rem",
+                        fontWeight: "700",
+                      }}
+                    >
                       {efectividad}
                     </p>
                   </div>
@@ -494,7 +553,13 @@ export default function PlayerPageClient() {
                   justifyContent: "space-between",
                 }}
               >
-                <p style={{ margin: 0, fontWeight: "600", color: "rgb(51, 65, 85)" }}>
+                <p
+                  style={{
+                    margin: 0,
+                    fontWeight: "600",
+                    color: "rgb(51, 65, 85)",
+                  }}
+                >
                   Verificado
                 </p>
                 <div

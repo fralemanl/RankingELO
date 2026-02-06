@@ -43,7 +43,15 @@ export default function TopPlayersShowcase({ players, gender, category }) {
   };
 
   const getPlayerName = (p) => {
-    return p.NAME || p.Name || p.name || p.NOMBRE || p.Nombre || p.nombre || "Jugador";
+    return (
+      p.NAME ||
+      p.Name ||
+      p.name ||
+      p.NOMBRE ||
+      p.Nombre ||
+      p.nombre ||
+      "Jugador"
+    );
   };
 
   if (topPlayers.length === 0) return null;
@@ -51,8 +59,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
   const player = topPlayers[currentIndex];
   const foto = getFoto(player);
   const fotoSrc =
-    buildGoogleDriveImageUrl(foto) ||
-    buildGoogleDriveThumbnailUrl(foto);
+    buildGoogleDriveImageUrl(foto) || buildGoogleDriveThumbnailUrl(foto);
   const medal = getMedalEmoji(currentIndex);
   const medalColor = getMedalColor(currentIndex);
   const playerName = getPlayerName(player);
@@ -95,7 +102,11 @@ export default function TopPlayersShowcase({ players, gender, category }) {
         >
           {/* Botones de navegación */}
           <button
-            onClick={() => setCurrentIndex((prev) => (prev - 1 + topPlayers.length) % topPlayers.length)}
+            onClick={() =>
+              setCurrentIndex(
+                (prev) => (prev - 1 + topPlayers.length) % topPlayers.length,
+              )
+            }
             style={{
               position: "absolute",
               left: "1rem",
@@ -126,7 +137,9 @@ export default function TopPlayersShowcase({ players, gender, category }) {
           </button>
 
           <button
-            onClick={() => setCurrentIndex((prev) => (prev + 1) % topPlayers.length)}
+            onClick={() =>
+              setCurrentIndex((prev) => (prev + 1) % topPlayers.length)
+            }
             style={{
               position: "absolute",
               right: "1rem",
@@ -160,11 +173,16 @@ export default function TopPlayersShowcase({ players, gender, category }) {
           <Link
             key={currentIndex}
             href={`/player/${encodeURIComponent(
-              playerName
+              playerName,
             )}?gender=${encodeURIComponent(
-              gender
+              gender,
             )}&category=${encodeURIComponent(category || "all")}`}
-            style={{ textDecoration: "none", flex: 1, display: "flex", justifyContent: "center" }}
+            style={{
+              textDecoration: "none",
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+            }}
           >
             <div
               style={{
@@ -216,7 +234,8 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                       fontWeight: "300",
                       color: "white",
                       margin: "0",
-                      fontFamily: "'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif",
+                      fontFamily:
+                        "'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif",
                       letterSpacing: "0.5px",
                     }}
                   >
@@ -238,7 +257,11 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                     textTransform: "uppercase",
                   }}
                 >
-                  CATEGORIA : {player.CATEGORY || player.Category || player.categoria || "-"}
+                  CATEGORIA :{" "}
+                  {player.CATEGORY ||
+                    player.Category ||
+                    player.categoria ||
+                    "-"}
                 </span>
 
                 {/* Puntaje */}
@@ -265,7 +288,13 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                     >
                       ELO
                     </p>
-                    <p style={{ fontSize: "1.5rem", fontWeight: "bold", margin: "0" }}>
+                    <p
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        margin: "0",
+                      }}
+                    >
                       {score}
                     </p>
                   </div>
@@ -334,9 +363,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                 height: "0.75rem",
                 borderRadius: "9999px",
                 backgroundColor:
-                  idx === currentIndex
-                    ? medalColor
-                    : "rgb(226, 232, 240)",
+                  idx === currentIndex ? medalColor : "rgb(226, 232, 240)",
                 border: "none",
                 cursor: "pointer",
                 transition: "all 0.3s ease-in-out",
