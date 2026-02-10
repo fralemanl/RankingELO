@@ -467,8 +467,8 @@ export default function PlayerPageClient() {
                       src={flagImagePath}
                       alt={nationality ? `Bandera ${nationality}` : "Bandera"}
                       style={{
-                        width: "28px",
-                        height: "20px",
+                        width: "40px",
+                        height: "28px",
                         objectFit: "cover",
                         borderRadius: "4px",
                         boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
