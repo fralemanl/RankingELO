@@ -424,7 +424,7 @@ export default function PlayerPageClient() {
                     color: "rgb(71, 85, 105)",
                     fontSize: "1.05rem",
                     display: "flex",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                     justifyContent: "center",
                     gap: "0.5rem",
                     flexWrap: "wrap",
@@ -436,8 +436,8 @@ export default function PlayerPageClient() {
                       src={flagImagePath}
                       alt={nationality ? `Bandera ${nationality}` : "Bandera"}
                       style={{
-                        width: "100px",
-                        height: "50px",
+                        width: "60px",
+                        height: "30px",
                         objectFit: "cover",
                         borderRadius: "6px",
                         boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
