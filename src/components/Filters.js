@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Filters({
   gender,
   onChangeGender,
@@ -21,7 +23,32 @@ export default function Filters({
       fontSize: "1.125rem",
       fontWeight: "600",
       color: "rgb(15, 23, 42)",
+    },
+    header: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: "1rem",
       marginBottom: "1.5rem",
+    },
+    eloLink: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "0.5rem",
+      padding: "0.5rem 0.9rem",
+      borderRadius: "999px",
+      backgroundColor: "rgb(15, 23, 42)",
+      color: "white",
+      fontSize: "0.875rem",
+      fontWeight: "600",
+      textDecoration: "none",
+      whiteSpace: "nowrap",
+    },
+    eloDot: {
+      width: "0.5rem",
+      height: "0.5rem",
+      borderRadius: "999px",
+      backgroundColor: "rgb(56, 189, 248)",
     },
     grid: {
       display: "grid",
@@ -49,7 +76,13 @@ export default function Filters({
 
   return (
     <div style={filterStyles.container}>
-      <h3 style={filterStyles.title}>Filtrar Resultados</h3>
+      <div style={filterStyles.header}>
+        <h3 style={filterStyles.title}>Filtrar Resultados</h3>
+        <Link href="/elo" style={filterStyles.eloLink}>
+          <span style={filterStyles.eloDot} />
+          Comparar ELO
+        </Link>
+      </div>
 
       <div style={filterStyles.grid}>
         {/* Género */}
@@ -102,7 +135,6 @@ export default function Filters({
             ))}
           </select>
         </div>
-
       </div>
 
       {/* Buscador */}
