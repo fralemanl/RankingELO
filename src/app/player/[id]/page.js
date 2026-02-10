@@ -23,6 +23,7 @@ const COLUMN_INDEX = {
   RADAR_START: 10, // K
   RADAR_END: 16, // Q
   PHOTO: 17, // R
+  NATIONALITY: 18, // S
 };
 
 const getColumnValue = (row, index) => {
@@ -69,6 +70,10 @@ export default function PlayerPageClient() {
           const categoryValue = getColumnValue(row, COLUMN_INDEX.CATEGORY);
           const eloValue = getColumnValue(row, COLUMN_INDEX.ELO);
           const photoValue = getColumnValue(row, COLUMN_INDEX.PHOTO);
+          const nationalityValue = getColumnValue(
+            row,
+            COLUMN_INDEX.NATIONALITY
+          );
           const tournaments = getColumnValue(row, COLUMN_INDEX.TOURNAMENTS);
           const matches = getColumnValue(row, COLUMN_INDEX.MATCHES);
           const wins = getColumnValue(row, COLUMN_INDEX.WINS);
@@ -100,6 +105,7 @@ export default function PlayerPageClient() {
             WINS: wins,
             EFFECTIVENESS: effectiveness,
             VERIFIED: verified,
+            NATIONALITY: nationalityValue,
             RADAR_STATS: radarStats,
             gender,
             _raw: row,
@@ -390,6 +396,15 @@ export default function PlayerPageClient() {
                   }}
                 >
                   Categoría: {player.CATEGORY || "—"}
+                </p>
+                <p
+                  style={{
+                    margin: "0.35rem 0 0",
+                    color: "rgb(71, 85, 105)",
+                    fontSize: "1.05rem",
+                  }}
+                >
+                  Nacionalidad: {player.NATIONALITY || "—"}
                 </p>
               </div>
             </div>
