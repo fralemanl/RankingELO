@@ -42,6 +42,47 @@ const parseEloValue = (value) => {
 
 const RADAR_FALLBACK_LABELS = ["K", "L", "M", "N", "O", "P", "Q"];
 
+const normalizeText = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/ã±/gi, "n")
+    .replace(/ã¡/gi, "a")
+    .replace(/ã©/gi, "e")
+    .replace(/ã­/gi, "i")
+    .replace(/ã³/gi, "o")
+    .replace(/ãº/gi, "u")
+    .replace(/ã¼/gi, "u")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+const getFlagEmoji = (nationality) => {
+  const key = normalizeText(nationality);
+  if (!key) return "";
+  if (key === "panama" || key === "panamá") return "🇵🇦";
+  if (key === "usa" || key === "estados unidos" || key === "eeuu") return "🇺🇸";
+  if (key === "argentina") return "🇦🇷";
+  if (key === "colombia") return "🇨🇴";
+  if (key === "mexico" || key === "méxico") return "🇲🇽";
+  if (key === "chile") return "🇨🇱";
+  if (key === "peru" || key === "perú") return "🇵🇪";
+  if (key === "venezuela") return "🇻🇪";
+  if (key === "espana" || key === "españa") return "🇪🇸";
+  if (key === "brasil" || key === "brasil") return "🇧🇷";
+  if (key === "uruguay") return "🇺🇾";
+  if (key === "paraguay") return "🇵🇾";
+  if (key === "bolivia") return "🇧🇴";
+  if (key === "ecuador") return "🇪🇨";
+  if (key === "guatemala") return "🇬🇹";
+  if (key === "costa rica") return "🇨🇷";
+  if (key === "republica dominicana" || key === "república dominicana") return "🇩🇴";
+  if (key === "honduras") return "🇭🇳";
+  if (key === "nicaragua") return "🇳🇮";
+  if (key === "elsalvador" || key === "el salvador") return "🇸🇻";
+  if (key === "canada" || key === "canadá") return "🇨🇦";
+  return "";
+};
+
 export default function PlayerPageClient() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -292,6 +333,8 @@ export default function PlayerPageClient() {
     String(player.VERIFIED || "").toLowerCase() === "true" ||
     String(player.VERIFIED || "").toLowerCase() === "1" ||
     String(player.VERIFIED || "").toLowerCase() === "si";
+  const nationality = player.NATIONALITY || "";
+  const flagEmoji = getFlagEmoji(nationality);
 
   const globalRank = (() => {
     if (!allPlayers.length) return "—";
@@ -404,7 +447,7 @@ export default function PlayerPageClient() {
                     fontSize: "1.05rem",
                   }}
                 >
-                  Nacionalidad: {player.NATIONALITY || "—"}
+                  Nacionalidad: {nationality || "—"} {flagEmoji}
                 </p>
               </div>
             </div>
