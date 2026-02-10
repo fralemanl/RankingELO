@@ -423,9 +423,30 @@ export default function PlayerPageClient() {
                     margin: "0.35rem 0 0",
                     color: "rgb(71, 85, 105)",
                     fontSize: "1.05rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    flexWrap: "wrap",
                   }}
                 >
-                  Nacionalidad: {player.NATIONALITY || "—"}
+                  <span>Nacionalidad: {player.NATIONALITY || "—"}</span>
+                  {flagImagePath ? (
+                    <img
+                      src={flagImagePath}
+                      alt={nationality ? `Bandera ${nationality}` : "Bandera"}
+                      style={{
+                        width: "100px",
+                        height: "50px",
+                        objectFit: "cover",
+                        borderRadius: "6px",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ) : null}
                 </p>
               </div>
             </div>
@@ -461,40 +482,22 @@ export default function PlayerPageClient() {
                     {eloDisplay}
                   </p>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                  {flagImagePath ? (
-                    <img
-                      src={flagImagePath}
-                      alt={nationality ? `Bandera ${nationality}` : "Bandera"}
-                      style={{
-                        width: "40px",
-                        height: "28px",
-                        objectFit: "cover",
-                        borderRadius: "4px",
-                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
-                      }}
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                      }}
-                    />
-                  ) : null}
-                  <div
-                    style={{
-                      textAlign: "right",
-                      backgroundColor: "rgba(255, 255, 255, 0.2)",
-                      borderRadius: "0.75rem",
-                      padding: "0.5rem 0.75rem",
-                    }}
+                <div
+                  style={{
+                    textAlign: "right",
+                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "0.75rem",
+                    padding: "0.5rem 0.75rem",
+                  }}
+                >
+                  <p style={{ margin: 0, fontSize: "0.75rem", opacity: 0.9 }}>
+                    Ranking Global
+                  </p>
+                  <p
+                    style={{ margin: 0, fontSize: "1.4rem", fontWeight: "700" }}
                   >
-                    <p style={{ margin: 0, fontSize: "0.75rem", opacity: 0.9 }}>
-                      Ranking Global
-                    </p>
-                    <p
-                      style={{ margin: 0, fontSize: "1.4rem", fontWeight: "700" }}
-                    >
-                      #{globalRank}
-                    </p>
-                  </div>
+                    #{globalRank}
+                  </p>
                 </div>
               </div>
 
