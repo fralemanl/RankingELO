@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
   fetchPlayers,
   fetchCategoryTable,
@@ -349,6 +350,22 @@ export default function ComparePage() {
       }}
     >
       <div style={{ maxWidth: "62rem", margin: "0 auto" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1.5rem" }}>
+          <Link
+            href="/"
+            style={{
+              padding: "0.5rem 1rem",
+              backgroundColor: "white",
+              borderRadius: "999px",
+              border: "1px solid #cfcfcf",
+              color: "#0f172a",
+              fontWeight: "600",
+              textDecoration: "none",
+            }}
+          >
+            Volver al ranking
+          </Link>
+        </div>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}>
           <button
             type="button"
