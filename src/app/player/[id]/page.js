@@ -42,6 +42,25 @@ const parseEloValue = (value) => {
 
 const RADAR_FALLBACK_LABELS = ["K", "L", "M", "N", "O", "P", "Q"];
 
+const normalizeText = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+const getFlagImagePath = (nationality) => {
+  const key = normalizeText(nationality);
+  if (!key) return "";
+  if (key === "panama") return "/flags/pa.png";
+  if (key === "colombia") return "/flags/co.png";
+  if (key === "argentina") return "/flags/ar.png";
+  if (key === "espana") return "/flags/es.png";
+  if (key === "paraguay") return "/flags/py.png";
+  if (key === "venezuela") return "/flags/ve.png";
+  return "";
+};
+
 export default function PlayerPageClient() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -72,7 +91,7 @@ export default function PlayerPageClient() {
           const photoValue = getColumnValue(row, COLUMN_INDEX.PHOTO);
           const nationalityValue = getColumnValue(
             row,
-            COLUMN_INDEX.NATIONALITY
+            COLUMN_INDEX.NATIONALITY,
           );
           const tournaments = getColumnValue(row, COLUMN_INDEX.TOURNAMENTS);
           const matches = getColumnValue(row, COLUMN_INDEX.MATCHES);
@@ -292,6 +311,8 @@ export default function PlayerPageClient() {
     String(player.VERIFIED || "").toLowerCase() === "true" ||
     String(player.VERIFIED || "").toLowerCase() === "1" ||
     String(player.VERIFIED || "").toLowerCase() === "si";
+  const nationality = player.NATIONALITY || "";
+  const flagImagePath = getFlagImagePath(nationality);
 
   const globalRank = (() => {
     if (!allPlayers.length) return "—";
@@ -440,22 +461,40 @@ export default function PlayerPageClient() {
                     {eloDisplay}
                   </p>
                 </div>
-                <div
-                  style={{
-                    textAlign: "right",
-                    backgroundColor: "rgba(255, 255, 255, 0.2)",
-                    borderRadius: "0.75rem",
-                    padding: "0.5rem 0.75rem",
-                  }}
-                >
-                  <p style={{ margin: 0, fontSize: "0.75rem", opacity: 0.9 }}>
-                    Ranking Global
-                  </p>
-                  <p
-                    style={{ margin: 0, fontSize: "1.4rem", fontWeight: "700" }}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                  {flagImagePath ? (
+                    <img
+                      src={flagImagePath}
+                      alt={nationality ? `Bandera ${nationality}` : "Bandera"}
+                      style={{
+                        width: "28px",
+                        height: "20px",
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    style={{
+                      textAlign: "right",
+                      backgroundColor: "rgba(255, 255, 255, 0.2)",
+                      borderRadius: "0.75rem",
+                      padding: "0.5rem 0.75rem",
+                    }}
                   >
-                    #{globalRank}
-                  </p>
+                    <p style={{ margin: 0, fontSize: "0.75rem", opacity: 0.9 }}>
+                      Ranking Global
+                    </p>
+                    <p
+                      style={{ margin: 0, fontSize: "1.4rem", fontWeight: "700" }}
+                    >
+                      #{globalRank}
+                    </p>
+                  </div>
                 </div>
               </div>
 
