@@ -42,6 +42,13 @@ export default function TopPlayersShowcase({ players, gender, category }) {
     return "rgb(6, 182, 212)";
   };
 
+  const getCarouselBackground = (index) => {
+    if (index === 0) return "/WebOro.jpg";
+    if (index === 1) return "/WebPlata.jpg";
+    if (index === 2) return "/WebBronce.jpg";
+    return "/WebAzul.jpg";
+  };
+
   const getPlayerName = (p) => {
     return (
       p.NAME ||
@@ -62,6 +69,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
     buildGoogleDriveImageUrl(foto) || buildGoogleDriveThumbnailUrl(foto);
   const medal = getMedalEmoji(currentIndex);
   const medalColor = getMedalColor(currentIndex);
+  const carouselBackground = getCarouselBackground(currentIndex);
   const playerName = getPlayerName(player);
   const score = player.ELO_DISPLAY || player.ELO || 0;
 
@@ -86,7 +94,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
           style={{
             padding: "2rem",
             backgroundColor: "transparent",
-            backgroundImage: "url('/bgcarrousel.png')",
+            backgroundImage: `url('${carouselBackground}')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
