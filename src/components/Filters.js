@@ -80,7 +80,7 @@ export default function Filters({
         <h3 style={filterStyles.title}>Filtrar Resultados</h3>
         <Link href="/elo" style={filterStyles.eloLink}>
           <span style={filterStyles.eloDot} />
-          Comparar ELO
+          Calcula tu categoría
         </Link>
       </div>
 
