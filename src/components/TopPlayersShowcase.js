@@ -80,7 +80,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
     if (key === "mexico") return "/flags/mx.png";
     if (key === "costa rica") return "/flags/cr.png";
     if (key === "brasil") return "/flags/br.png";
-    if (key === "chile") return "/flags/ch.png";
+    if (key === "chile") return "/flags/cl.png";
     return "";
   };
 
@@ -245,7 +245,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                   flexShrink: 0,
                 }}
               >
-                {medal || currentIndex + 1}
+                {currentIndex + 1}
               </div>
 
               {/* Contenido Centro */}
@@ -260,7 +260,13 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                 }}
               >
                 {/* Nombre */}
-                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                  }}
+                >
                   <h3
                     style={{
                       fontSize: "2.5rem",
@@ -329,7 +335,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                   <div
                     style={{
                       padding: "0.75rem 1.25rem",
-                      backgroundColor: medalColor,
+                      backgroundColor: "rgba(15, 23, 42, 0.85)",
                       borderRadius: "0.75rem",
                       color: "white",
                       display: "flex",
