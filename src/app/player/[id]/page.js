@@ -478,7 +478,11 @@ export default function PlayerPageClient() {
                 }}
               >
                 <div
-                  style={{ display: "flex", alignItems: "center", gap: "2.5rem" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "2.5rem",
+                  }}
                 >
                   <div>
                     <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.9 }}>
