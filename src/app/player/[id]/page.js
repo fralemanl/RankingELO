@@ -59,6 +59,7 @@ const getFlagImagePath = (nationality) => {
   if (key === "espana") return "/flags/es.png";
   if (key === "paraguay") return "/flags/py.png";
   if (key === "venezuela") return "/flags/ve.png";
+  if (key === "chile" || key.startsWith("chil")) return "/flags/cl.png";
   return "";
 };
 
@@ -476,13 +477,19 @@ export default function PlayerPageClient() {
                   gap: "1rem",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "2.5rem" }}
+                >
                   <div>
                     <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.9 }}>
                       ELO
                     </p>
                     <p
-                      style={{ margin: 0, fontSize: "2.5rem", fontWeight: "700" }}
+                      style={{
+                        margin: 0,
+                        fontSize: "2.5rem",
+                        fontWeight: "700",
+                      }}
                     >
                       {eloDisplay}
                     </p>
@@ -492,7 +499,11 @@ export default function PlayerPageClient() {
                       Puntos
                     </p>
                     <p
-                      style={{ margin: 0, fontSize: "2.5rem", fontWeight: "700" }}
+                      style={{
+                        margin: 0,
+                        fontSize: "2.5rem",
+                        fontWeight: "700",
+                      }}
                     >
                       {points}
                     </p>

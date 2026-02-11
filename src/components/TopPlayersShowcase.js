@@ -80,7 +80,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
     if (key === "mexico") return "/flags/mx.png";
     if (key === "costa rica") return "/flags/cr.png";
     if (key === "brasil") return "/flags/br.png";
-    if (key === "chile") return "/flags/cl.png";
+    if (key === "chile" || key.startsWith("chil")) return "/flags/cl.png";
     return "";
   };
 
@@ -368,7 +368,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                   <div
                     style={{
                       padding: "0.75rem 1.25rem",
-                      backgroundColor: medalColor,
+                      backgroundColor: "rgba(15, 23, 42, 0.85)",
                       borderRadius: "0.75rem",
                       color: "white",
                       display: "flex",
@@ -379,7 +379,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                     <div>
                       <p
                         style={{
-                          fontSize: "0.75rem",
+                        backgroundColor: medalColor,
                           fontWeight: "600",
                           opacity: "0.95",
                           margin: "0 0 0.2rem 0",

@@ -28,6 +28,7 @@ export default function RankingTable({ players, allPlayers = [], category }) {
     if (key === "mexico") return "/flags/mx.png";
     if (key === "costa rica") return "/flags/cr.png";
     if (key === "brasil") return "/flags/br.png";
+    if (key === "chile" || key.startsWith("chil")) return "/flags/cl.png";
     return "";
   };
 
@@ -299,9 +300,7 @@ export default function RankingTable({ players, allPlayers = [], category }) {
                 <td style={tableStyles.scoreCell}>
                   {player.ELO_DISPLAY || player.ELO || 0}
                 </td>
-                <td style={tableStyles.scoreCell}>
-                  {player.POINTS || "—"}
-                </td>
+                <td style={tableStyles.scoreCell}>{player.POINTS || "—"}</td>
               </tr>
             );
           })}
