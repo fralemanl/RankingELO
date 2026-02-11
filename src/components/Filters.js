@@ -8,6 +8,10 @@ export default function Filters({
   categories = [],
   category,
   onChangeCategory,
+  nationality,
+  onChangeNationality,
+  sortBy,
+  onChangeSortBy,
   searchTerm,
   onChangeSearchTerm,
 }) {
@@ -133,6 +137,51 @@ export default function Filters({
                 {c === "all" ? "Todas las categorías" : c}
               </option>
             ))}
+          </select>
+        </div>
+
+        {/* Ordenar */}
+        <div style={filterStyles.group}>
+          <label style={filterStyles.label}>
+            <svg
+              style={filterStyles.icon}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              color="rgb(14, 165, 233)"
+            >
+              <path d="M5 4a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm0 6a1 1 0 011-1h5a1 1 0 110 2H6a1 1 0 01-1-1zm0 6a1 1 0 011-1h2a1 1 0 110 2H6a1 1 0 01-1-1z" />
+            </svg>
+            Ordenar por
+          </label>
+          <select value={sortBy} onChange={(e) => onChangeSortBy(e.target.value)}>
+            <option value="elo">ELO</option>
+            <option value="points">Puntos</option>
+          </select>
+        </div>
+
+        {/* Nacionalidad */}
+        <div style={filterStyles.group}>
+          <label style={filterStyles.label}>
+            <svg
+              style={filterStyles.icon}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              color="rgb(16, 185, 129)"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5 3a1 1 0 011-1h5a1 1 0 01.894.553l1.5 3A1 1 0 0114.5 7H7.236l1.382 2.764a1 1 0 01-.447 1.341l-1.106.553 1.362 2.724a1 1 0 01-.447 1.341l-1.5.75A1 1 0 015 15.618V3zm9.5 4a1 1 0 01.894.553l1.5 3a1 1 0 01-.447 1.341l-1.447.724 1.447 2.894A1 1 0 0115.5 17h-5a1 1 0 01-.894-.553l-1.5-3a1 1 0 01.447-1.341l1.106-.553L8.297 8.829A1 1 0 018.744 7.5H14.5z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Nacionalidad
+          </label>
+          <select
+            value={nationality}
+            onChange={(e) => onChangeNationality(e.target.value)}
+          >
+            <option value="all">Todas</option>
+            <option value="panama">Panamá</option>
           </select>
         </div>
       </div>

@@ -9,6 +9,28 @@ import {
 export default function RankingTable({ players, allPlayers = [], category }) {
   const getFoto = (p) => (p?.FOTO || p?.Foto || p?.foto || "").trim();
 
+  const normalizeText = (value) =>
+    String(value || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  const getFlagImagePath = (nationality) => {
+    const key = normalizeText(nationality);
+    if (!key) return "";
+    if (key === "panama") return "/flags/pa.png";
+    if (key === "colombia") return "/flags/co.png";
+    if (key === "argentina") return "/flags/ar.png";
+    if (key === "espana") return "/flags/es.png";
+    if (key === "paraguay") return "/flags/py.png";
+    if (key === "venezuela") return "/flags/ve.png";
+    if (key === "mexico") return "/flags/mx.png";
+    if (key === "costa rica") return "/flags/cr.png";
+    if (key === "brasil") return "/flags/br.png";
+    return "";
+  };
+
   const sortedPlayers = [...players].sort((a, b) => {
     const scoreA = parseFloat(a.ELO) || 0;
     const scoreB = parseFloat(b.ELO) || 0;
@@ -103,6 +125,18 @@ export default function RankingTable({ players, allPlayers = [], category }) {
       alignItems: "center",
       gap: "0.75rem",
     },
+    flagCell: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    flagImage: {
+      width: "40px",
+      height: "20px",
+      objectFit: "cover",
+      borderRadius: "4px",
+      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+    },
     playerImage: {
       width: "2.5rem",
       height: "2.5rem",
@@ -143,12 +177,14 @@ export default function RankingTable({ players, allPlayers = [], category }) {
         <thead style={tableStyles.thead}>
           <tr>
             <th style={tableStyles.th}># Cat.</th>
+            <th style={tableStyles.th}>Nac.</th>
             <th style={tableStyles.th}>Jugador</th>
             <th style={tableStyles.th}>Categoría</th>
             <th style={{ ...tableStyles.th, textAlign: "center" }}>
               Global 🌍
             </th>
             <th style={{ ...tableStyles.th, textAlign: "center" }}>ELO</th>
+            <th style={{ ...tableStyles.th, textAlign: "center" }}>Puntos</th>
           </tr>
         </thead>
         <tbody style={tableStyles.tbody}>
@@ -159,6 +195,7 @@ export default function RankingTable({ players, allPlayers = [], category }) {
               buildGoogleDriveThumbnailUrl(fotoValue, 120);
             const medal = getMedalEmoji(index);
             const categoryRank = getCategoryRank(player);
+            const flagPath = getFlagImagePath(player.NATIONALITY);
 
             return (
               <tr
@@ -178,6 +215,26 @@ export default function RankingTable({ players, allPlayers = [], category }) {
                     </span>
                     {medal && (
                       <span style={{ fontSize: "1.5rem" }}>{medal}</span>
+                    )}
+                  </div>
+                </td>
+                <td style={tableStyles.td}>
+                  <div style={tableStyles.flagCell}>
+                    {flagPath ? (
+                      <img
+                        src={flagPath}
+                        alt={
+                          player.NATIONALITY
+                            ? `Bandera ${player.NATIONALITY}`
+                            : "Bandera"
+                        }
+                        style={tableStyles.flagImage}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <span style={{ color: "rgb(148, 163, 184)" }}>—</span>
                     )}
                   </div>
                 </td>
@@ -244,6 +301,9 @@ export default function RankingTable({ players, allPlayers = [], category }) {
                 </td>
                 <td style={tableStyles.scoreCell}>
                   {player.ELO_DISPLAY || player.ELO || 0}
+                </td>
+                <td style={tableStyles.scoreCell}>
+                  {player.POINTS || "—"}
                 </td>
               </tr>
             );

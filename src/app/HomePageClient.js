@@ -9,9 +9,11 @@ import TopPlayersShowcase from "@/components/TopPlayersShowcase";
 
 const COLUMN_INDEX = {
   NAME: 1, // Columna B
+  POINTS: 2, // Columna C
   ELO: 3, // Columna D
   CATEGORY: 4, // Columna E
   PHOTO: 17, // Columna R
+  NATIONALITY: 18, // Columna S
 };
 
 const getColumnValue = (row, index) => {
@@ -28,10 +30,19 @@ const parseEloValue = (value) => {
   return Number.isNaN(parsed) ? 0 : parsed;
 };
 
+const normalizeText = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
 export default function HomePageClient() {
   const searchParams = useSearchParams();
   const [gender, setGender] = useState("masculino");
   const [category, setCategory] = useState("all");
+  const [nationality, setNationality] = useState("all");
+  const [sortBy, setSortBy] = useState("elo");
   const [searchTerm, setSearchTerm] = useState("");
   const initializedRef = useRef(false);
   const storageKey = "rankingEloFilters";
@@ -44,18 +55,26 @@ export default function HomePageClient() {
 
     const paramGender = searchParams?.get("gender");
     const paramCategory = searchParams?.get("category");
+    const paramNationality = searchParams?.get("nationality");
+    const paramSortBy = searchParams?.get("sortBy");
 
     let nextGender = paramGender || "masculino";
     let nextCategory = paramCategory || "all";
+    let nextNationality = paramNationality || "all";
+    let nextSortBy = paramSortBy || "elo";
     let nextSearchTerm = "";
 
-    if (!paramGender || !paramCategory) {
+    if (!paramGender || !paramCategory || !paramNationality || !paramSortBy) {
       const stored = window.sessionStorage.getItem(storageKey);
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
           if (!paramGender && parsed?.gender) nextGender = parsed.gender;
-          if (!paramCategory && parsed?.category) nextCategory = parsed.category;
+          if (!paramCategory && parsed?.category)
+            nextCategory = parsed.category;
+          if (!paramNationality && parsed?.nationality)
+            nextNationality = parsed.nationality;
+          if (!paramSortBy && parsed?.sortBy) nextSortBy = parsed.sortBy;
           if (parsed?.searchTerm) nextSearchTerm = parsed.searchTerm;
         } catch {
           // ignore parse errors
@@ -65,12 +84,16 @@ export default function HomePageClient() {
 
     setGender(nextGender);
     setCategory(nextCategory);
+    setNationality(nextNationality);
+    setSortBy(nextSortBy);
     setSearchTerm(nextSearchTerm);
     initializedRef.current = true;
 
     const params = new URLSearchParams(window.location.search);
     params.set("gender", nextGender);
     params.set("category", nextCategory);
+    params.set("nationality", nextNationality);
+    params.set("sortBy", nextSortBy);
     const query = params.toString();
     const nextUrl = query ? `/?${query}` : "/";
     window.history.replaceState(null, "", nextUrl);
@@ -80,17 +103,19 @@ export default function HomePageClient() {
     if (!initializedRef.current || typeof window === "undefined") return;
     window.sessionStorage.setItem(
       storageKey,
-      JSON.stringify({ gender, category, searchTerm })
+      JSON.stringify({ gender, category, nationality, sortBy, searchTerm }),
     );
 
     const params = new URLSearchParams(window.location.search);
     params.set("gender", gender);
     params.set("category", category);
+    params.set("nationality", nationality);
+    params.set("sortBy", sortBy);
     const query = params.toString();
     const nextUrl = query ? `/?${query}` : "/";
 
     window.history.replaceState(null, "", nextUrl);
-  }, [gender, category]);
+  }, [gender, category, nationality, sortBy]);
 
   useEffect(() => {
     let mounted = true;
@@ -102,12 +127,19 @@ export default function HomePageClient() {
           .filter(Boolean)
           .map((row) => {
             const name = getColumnValue(row, COLUMN_INDEX.NAME);
+            const pointsValue = getColumnValue(row, COLUMN_INDEX.POINTS);
             const categoryValue = getColumnValue(row, COLUMN_INDEX.CATEGORY);
             const eloValue = getColumnValue(row, COLUMN_INDEX.ELO);
             const photoValue = getColumnValue(row, COLUMN_INDEX.PHOTO);
+            const nationalityValue = getColumnValue(
+              row,
+              COLUMN_INDEX.NATIONALITY,
+            );
             return {
               NAME: name,
+              POINTS: pointsValue,
               CATEGORY: categoryValue,
+              NATIONALITY: nationalityValue,
               ELO: parseEloValue(eloValue),
               ELO_DISPLAY: eloValue,
               FOTO: photoValue,
@@ -142,15 +174,32 @@ export default function HomePageClient() {
       filtered = filtered.filter((p) => (p.CATEGORY || "") === category);
     }
 
-    if (searchTerm.trim()) {
-      const term = searchTerm.trim().toLowerCase();
-      filtered = filtered.filter((p) =>
-        (p.NAME || "").toLowerCase().includes(term)
+    if (nationality !== "all") {
+      filtered = filtered.filter(
+        (p) => normalizeText(p.NATIONALITY) === normalizeText(nationality),
       );
     }
 
-    return filtered;
-  }, [players, category, searchTerm]);
+    if (searchTerm.trim()) {
+      const term = searchTerm.trim().toLowerCase();
+      filtered = filtered.filter((p) =>
+        (p.NAME || "").toLowerCase().includes(term),
+      );
+    }
+
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortBy === "points") {
+        const pointsA = parseFloat(a.POINTS) || 0;
+        const pointsB = parseFloat(b.POINTS) || 0;
+        return pointsB - pointsA;
+      }
+      const scoreA = parseFloat(a.ELO) || 0;
+      const scoreB = parseFloat(b.ELO) || 0;
+      return scoreB - scoreA;
+    });
+
+    return sorted;
+  }, [players, category, nationality, searchTerm, sortBy]);
 
   return (
     <div
@@ -182,6 +231,10 @@ export default function HomePageClient() {
             categories={categories}
             category={category}
             onChangeCategory={(c) => setCategory(c)}
+            nationality={nationality}
+            onChangeNationality={(value) => setNationality(value)}
+            sortBy={sortBy}
+            onChangeSortBy={(value) => setSortBy(value)}
             searchTerm={searchTerm}
             onChangeSearchTerm={(term) => setSearchTerm(term)}
           />
