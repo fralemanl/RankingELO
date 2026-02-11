@@ -346,7 +346,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                     <div>
                       <p
                         style={{
-                          backgroundColor: "rgba(15, 23, 42, 0.85)",
+                        backgroundColor: medalColor,
                           fontWeight: "600",
                           opacity: "0.95",
                           margin: "0 0 0.2rem 0",
@@ -379,7 +379,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                     <div>
                       <p
                         style={{
-                          backgroundColor: medalColor,
+                        backgroundColor: medalColor,
                           fontWeight: "600",
                           opacity: "0.95",
                           margin: "0 0 0.2rem 0",
