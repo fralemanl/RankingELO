@@ -61,6 +61,29 @@ export default function TopPlayersShowcase({ players, gender, category }) {
     );
   };
 
+  const normalizeText = (value) =>
+    String(value || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  const getFlagImagePath = (nationality) => {
+    const key = normalizeText(nationality);
+    if (!key) return "";
+    if (key === "panama") return "/flags/pa.png";
+    if (key === "colombia") return "/flags/co.png";
+    if (key === "argentina") return "/flags/ar.png";
+    if (key === "espana") return "/flags/es.png";
+    if (key === "paraguay") return "/flags/py.png";
+    if (key === "venezuela") return "/flags/ve.png";
+    if (key === "mexico") return "/flags/mx.png";
+    if (key === "costa rica") return "/flags/cr.png";
+    if (key === "brasil") return "/flags/br.png";
+    if (key === "chile") return "/flags/ch.png";
+    return "";
+  };
+
   if (topPlayers.length === 0) return null;
 
   const player = topPlayers[currentIndex];
@@ -73,6 +96,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
   const playerName = getPlayerName(player);
   const score = player.ELO_DISPLAY || player.ELO || 0;
   const points = player.POINTS || 0;
+  const flagPath = getFlagImagePath(player.NATIONALITY);
 
   return (
     <section
@@ -236,7 +260,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                 }}
               >
                 {/* Nombre */}
-                <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                   <h3
                     style={{
                       fontSize: "2.5rem",
@@ -250,6 +274,26 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                   >
                     {playerName}
                   </h3>
+                  {flagPath ? (
+                    <img
+                      src={flagPath}
+                      alt={
+                        player.NATIONALITY
+                          ? `Bandera ${player.NATIONALITY}`
+                          : "Bandera"
+                      }
+                      style={{
+                        width: "36px",
+                        height: "20px",
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.35)",
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ) : null}
                 </div>
 
                 {/* Categoría */}
@@ -318,7 +362,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                   <div
                     style={{
                       padding: "0.75rem 1.25rem",
-                      backgroundColor: "rgba(15, 23, 42, 0.85)",
+                      backgroundColor: medalColor,
                       borderRadius: "0.75rem",
                       color: "white",
                       display: "flex",

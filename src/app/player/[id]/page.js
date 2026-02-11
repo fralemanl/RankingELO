@@ -13,6 +13,7 @@ import PlayerRadar from "@/components/PlayerRadar";
 
 const COLUMN_INDEX = {
   NAME: 1, // B
+  POINTS: 2, // C
   ELO: 3, // D
   CATEGORY: 4, // E
   TOURNAMENTS: 5, // F
@@ -86,6 +87,7 @@ export default function PlayerPageClient() {
         if (!mounted) return;
         const normalized = (players || []).map((row) => {
           const name = getColumnValue(row, COLUMN_INDEX.NAME);
+          const pointsValue = getColumnValue(row, COLUMN_INDEX.POINTS);
           const categoryValue = getColumnValue(row, COLUMN_INDEX.CATEGORY);
           const eloValue = getColumnValue(row, COLUMN_INDEX.ELO);
           const photoValue = getColumnValue(row, COLUMN_INDEX.PHOTO);
@@ -115,6 +117,7 @@ export default function PlayerPageClient() {
           }
           return {
             NAME: name,
+            POINTS: pointsValue,
             CATEGORY: categoryValue,
             ELO: parseEloValue(eloValue),
             ELO_DISPLAY: eloValue,
