@@ -159,13 +159,25 @@ export default function HomePageClient() {
     return () => (mounted = false);
   }, [gender]);
 
-  const categories = useMemo(() => {
-    const set = new Set();
-    players.forEach((p) => {
-      if (p.CATEGORY) set.add(p.CATEGORY);
-    });
-    return ["all", ...Array.from(set).sort()];
-  }, [players]);
+  const categories = useMemo(
+    () => [
+      "all",
+      "PRO",
+      "1ra",
+      "2da",
+      "2da+",
+      "3ra",
+      "3ra+",
+      "4ta",
+      "4ta+",
+      "5ta",
+      "5ta+",
+      "6ta",
+      "6ta+",
+      "S/C",
+    ],
+    [],
+  );
 
   const visiblePlayers = useMemo(() => {
     let filtered = players;
