@@ -72,6 +72,7 @@ export default function TopPlayersShowcase({ players, gender, category }) {
   const carouselBackground = getCarouselBackground(currentIndex);
   const playerName = getPlayerName(player);
   const score = player.ELO_DISPLAY || player.ELO || 0;
+  const points = player.POINTS || 0;
 
   return (
     <section
@@ -275,36 +276,77 @@ export default function TopPlayersShowcase({ players, gender, category }) {
                 {/* Puntaje */}
                 <div
                   style={{
-                    padding: "0.75rem 1.25rem",
-                    backgroundColor: medalColor,
-                    borderRadius: "0.75rem",
-                    color: "white",
                     display: "flex",
                     alignItems: "center",
                     gap: "0.75rem",
                     width: "fit-content",
                   }}
                 >
-                  <div>
-                    <p
-                      style={{
-                        fontSize: "0.75rem",
-                        fontWeight: "600",
-                        opacity: "0.95",
-                        margin: "0 0 0.2rem 0",
-                      }}
-                    >
-                      ELO
-                    </p>
-                    <p
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        margin: "0",
-                      }}
-                    >
-                      {score}
-                    </p>
+                  <div
+                    style={{
+                      padding: "0.75rem 1.25rem",
+                      backgroundColor: medalColor,
+                      borderRadius: "0.75rem",
+                      color: "white",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.75rem",
+                    }}
+                  >
+                    <div>
+                      <p
+                        style={{
+                          fontSize: "0.75rem",
+                          fontWeight: "600",
+                          opacity: "0.95",
+                          margin: "0 0 0.2rem 0",
+                        }}
+                      >
+                        ELO
+                      </p>
+                      <p
+                        style={{
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          margin: "0",
+                        }}
+                      >
+                        {score}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      padding: "0.75rem 1.25rem",
+                      backgroundColor: "rgba(15, 23, 42, 0.85)",
+                      borderRadius: "0.75rem",
+                      color: "white",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.75rem",
+                    }}
+                  >
+                    <div>
+                      <p
+                        style={{
+                          fontSize: "0.75rem",
+                          fontWeight: "600",
+                          opacity: "0.95",
+                          margin: "0 0 0.2rem 0",
+                        }}
+                      >
+                        Puntos
+                      </p>
+                      <p
+                        style={{
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          margin: "0",
+                        }}
+                      >
+                        {points}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

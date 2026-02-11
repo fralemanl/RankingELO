@@ -303,6 +303,7 @@ export default function PlayerPageClient() {
     buildGoogleDriveImageUrl(foto) || buildGoogleDriveThumbnailUrl(foto);
 
   const eloDisplay = player.ELO_DISPLAY || player.ELO || 0;
+  const points = player.POINTS || 0;
   const torneos = player.TOURNAMENTS || 0;
   const partidos = player.MATCHES || 0;
   const ganados = player.WINS || 0;
@@ -472,15 +473,27 @@ export default function PlayerPageClient() {
                   gap: "1rem",
                 }}
               >
-                <div>
-                  <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.9 }}>
-                    ELO
-                  </p>
-                  <p
-                    style={{ margin: 0, fontSize: "2.5rem", fontWeight: "700" }}
-                  >
-                    {eloDisplay}
-                  </p>
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                  <div>
+                    <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.9 }}>
+                      ELO
+                    </p>
+                    <p
+                      style={{ margin: 0, fontSize: "2.5rem", fontWeight: "700" }}
+                    >
+                      {eloDisplay}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.9 }}>
+                      Puntos
+                    </p>
+                    <p
+                      style={{ margin: 0, fontSize: "2.5rem", fontWeight: "700" }}
+                    >
+                      {points}
+                    </p>
+                  </div>
                 </div>
                 <div
                   style={{
