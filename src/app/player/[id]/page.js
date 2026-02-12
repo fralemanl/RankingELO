@@ -549,6 +549,8 @@ export default function PlayerPageClient() {
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
                     gap: "1rem",
+                    textAlign: "center",
+                    justifyItems: "center",
                   }}
                 >
                   <div>
