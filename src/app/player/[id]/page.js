@@ -25,6 +25,7 @@ const COLUMN_INDEX = {
   RADAR_END: 16, // Q
   PHOTO: 17, // R
   NATIONALITY: 18, // S
+  POINTS_AVG: 19, // T
 };
 
 const getColumnValue = (row, index) => {
@@ -89,6 +90,7 @@ export default function PlayerPageClient() {
         const normalized = (players || []).map((row) => {
           const name = getColumnValue(row, COLUMN_INDEX.NAME);
           const pointsValue = getColumnValue(row, COLUMN_INDEX.POINTS);
+          const pointsAvgValue = getColumnValue(row, COLUMN_INDEX.POINTS_AVG);
           const categoryValue = getColumnValue(row, COLUMN_INDEX.CATEGORY);
           const eloValue = getColumnValue(row, COLUMN_INDEX.ELO);
           const photoValue = getColumnValue(row, COLUMN_INDEX.PHOTO);
@@ -119,6 +121,7 @@ export default function PlayerPageClient() {
           return {
             NAME: name,
             POINTS: pointsValue,
+            POINTS_AVG: pointsAvgValue,
             CATEGORY: categoryValue,
             ELO: parseEloValue(eloValue),
             ELO_DISPLAY: eloValue,
@@ -308,6 +311,7 @@ export default function PlayerPageClient() {
 
   const eloDisplay = player.ELO_DISPLAY || player.ELO || 0;
   const points = player.POINTS || 0;
+  const pointsAvg = player.POINTS_AVG || 0;
   const torneos = player.TOURNAMENTS || 0;
   const partidos = player.MATCHES || 0;
   const ganados = player.WINS || 0;
@@ -625,6 +629,26 @@ export default function PlayerPageClient() {
                       }}
                     >
                       {efectividad}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "rgb(100, 116, 139)",
+                        fontSize: "0.8rem",
+                      }}
+                    >
+                      Puntos promedio
+                    </p>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "1.5rem",
+                        fontWeight: "700",
+                      }}
+                    >
+                      {pointsAvg}
                     </p>
                   </div>
                 </div>
