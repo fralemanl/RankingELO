@@ -22,6 +22,15 @@ export default function TopPlayersShowcase({ players, gender, category }) {
 
   // Auto-rotate cada 4 segundos
   useEffect(() => {
+    if (topPlayers.length === 0) {
+      setCurrentIndex(0);
+      return;
+    }
+    if (topPlayers.length === 1) {
+      setCurrentIndex(0);
+      return;
+    }
+
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % topPlayers.length);
     }, 4000);
@@ -86,7 +95,8 @@ export default function TopPlayersShowcase({ players, gender, category }) {
 
   if (topPlayers.length === 0) return null;
 
-  const player = topPlayers[currentIndex];
+  const safeIndex = Number.isInteger(currentIndex) ? currentIndex : 0;
+  const player = topPlayers[safeIndex] || topPlayers[0];
   const foto = getFoto(player);
   const fotoSrc =
     buildGoogleDriveImageUrl(foto) || buildGoogleDriveThumbnailUrl(foto);
