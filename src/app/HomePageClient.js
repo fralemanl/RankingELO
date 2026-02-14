@@ -37,6 +37,17 @@ const normalizeText = (value) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
+const CATEGORY_OPTIONS = [
+  "all",
+  "PRO",
+  "1ra",
+  "2da",
+  "3ra",
+  "4ta",
+  "5ta",
+  "6ta",
+];
+
 export default function HomePageClient() {
   const searchParams = useSearchParams();
   const [gender, setGender] = useState("masculino");
@@ -83,6 +94,9 @@ export default function HomePageClient() {
     }
 
     setGender(nextGender);
+    if (!CATEGORY_OPTIONS.includes(nextCategory)) {
+      nextCategory = "all";
+    }
     setCategory(nextCategory);
     setNationality(nextNationality);
     setSortBy(nextSortBy);
@@ -159,25 +173,7 @@ export default function HomePageClient() {
     return () => (mounted = false);
   }, [gender]);
 
-  const categories = useMemo(
-    () => [
-      "all",
-      "PRO",
-      "1ra",
-      "2da",
-      "2da+",
-      "3ra",
-      "3ra+",
-      "4ta",
-      "4ta+",
-      "5ta",
-      "5ta+",
-      "6ta",
-      "6ta+",
-      "S/C",
-    ],
-    [],
-  );
+  const categories = useMemo(() => CATEGORY_OPTIONS, []);
 
   const visiblePlayers = useMemo(() => {
     let filtered = players;
