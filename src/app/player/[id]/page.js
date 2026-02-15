@@ -447,18 +447,9 @@ export default function PlayerPageClient() {
                 </h1>
                 <p
                   style={{
-                    margin: "0.5rem 0 0",
-                    color: "rgb(71, 85, 105)",
-                    fontSize: "1.125rem",
-                  }}
-                >
-                  Categoría: {player.CATEGORY || "—"}
-                </p>
-                <p
-                  style={{
                     margin: "0.35rem 0 0",
                     color: "rgb(71, 85, 105)",
-                    fontSize: "1.05rem",
+                    fontSize: "1.25rem",
                     display: "flex",
                     alignItems: "flex-start",
                     justifyContent: "center",
@@ -728,82 +719,6 @@ export default function PlayerPageClient() {
                 style={{
                   backgroundColor: "white",
                   borderRadius: "1rem",
-                  padding: "1.5rem",
-                  border: "1px solid rgb(226, 232, 240)",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  <span
-                    style={{
-                      backgroundColor: "rgb(226, 232, 240)",
-                      color: "rgb(51, 65, 85)",
-                      padding: "0.2rem 0.75rem",
-                      borderRadius: "9999px",
-                      fontSize: "0.8rem",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Historico
-                  </span>
-                </div>
-                {hasHistoricStats ? (
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "repeat(auto-fit, minmax(140px, 1fr))",
-                      gap: "1rem",
-                      textAlign: "center",
-                      justifyItems: "center",
-                    }}
-                  >
-                    {historicStats.map((stat) => (
-                      <div key={stat.stat}>
-                        <p
-                          style={{
-                            margin: 0,
-                            color: "rgb(100, 116, 139)",
-                            fontSize: "0.8rem",
-                          }}
-                        >
-                          {stat.stat}
-                        </p>
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: "1.5rem",
-                            fontWeight: "700",
-                          }}
-                        >
-                          {stat.value}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p
-                    style={{
-                      margin: 0,
-                      textAlign: "center",
-                      color: "rgb(100, 116, 139)",
-                    }}
-                  >
-                    Sin datos historicos
-                  </p>
-                )}
-              </div>
-
-              <div
-                style={{
-                  backgroundColor: "white",
-                  borderRadius: "1rem",
                   padding: "1rem 1.25rem",
                   border: "1px solid rgb(226, 232, 240)",
                   display: "flex",
@@ -888,6 +803,78 @@ export default function PlayerPageClient() {
             📊 Características
           </h2>
           <PlayerRadar player={player} />
+        </div>
+
+        {/* Historico */}
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "1.5rem",
+            padding: "2rem",
+            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+            marginBottom: "2rem",
+            animation: "slideUp 0.5s ease-out 0.65s both",
+          }}
+        >
+          <h2
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              color: "rgb(15, 23, 42)",
+              marginBottom: "1.5rem",
+              textAlign: "center",
+            }}
+          >
+            Historico
+          </h2>
+          {hasHistoricStats ? (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                gap: "1.5rem",
+                textAlign: "center",
+                justifyItems: "center",
+                backgroundColor: "rgb(248, 250, 252)",
+                borderRadius: "1rem",
+                padding: "1.5rem",
+                border: "1px solid rgb(226, 232, 240)",
+              }}
+            >
+              {historicStats.map((stat) => (
+                <div key={stat.stat}>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "rgb(100, 116, 139)",
+                      fontSize: "0.85rem",
+                    }}
+                  >
+                    {stat.stat}
+                  </p>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "1.7rem",
+                      fontWeight: "700",
+                    }}
+                  >
+                    {stat.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p
+              style={{
+                margin: 0,
+                textAlign: "center",
+                color: "rgb(100, 116, 139)",
+              }}
+            >
+              Sin datos historicos
+            </p>
+          )}
         </div>
 
         {/* Resultados */}
