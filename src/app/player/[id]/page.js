@@ -26,6 +26,8 @@ const COLUMN_INDEX = {
   PHOTO: 17, // R
   NATIONALITY: 18, // S
   POINTS_AVG: 19, // T
+  HISTORIC_START: 20, // U
+  HISTORIC_END: 22, // W
 };
 
 const getColumnValue = (row, index) => {
@@ -43,6 +45,11 @@ const parseEloValue = (value) => {
 };
 
 const RADAR_FALLBACK_LABELS = ["K", "L", "M", "N", "O", "P", "Q"];
+const HISTORIC_FALLBACK_LABELS = [
+  "TOTAL PUNTOS",
+  "TORNEOS JUGADOS",
+  "PROMEDIO POR TORNEO",
+];
 
 const normalizeText = (value) =>
   String(value || "")
@@ -118,6 +125,21 @@ export default function PlayerPageClient() {
               value: parseFloat(getColumnValue(row, idx)) || 0,
             });
           }
+          const historicStats = [];
+          for (
+            let idx = COLUMN_INDEX.HISTORIC_START;
+            idx <= COLUMN_INDEX.HISTORIC_END;
+            idx += 1
+          ) {
+            const label =
+              headers[idx] ||
+              HISTORIC_FALLBACK_LABELS[idx - COLUMN_INDEX.HISTORIC_START];
+            const value = getColumnValue(row, idx);
+            historicStats.push({
+              stat: label || `Col ${idx + 1}`,
+              value: value || "—",
+            });
+          }
           return {
             NAME: name,
             POINTS: pointsValue,
@@ -133,6 +155,7 @@ export default function PlayerPageClient() {
             VERIFIED: verified,
             NATIONALITY: nationalityValue,
             RADAR_STATS: radarStats,
+            HISTORIC_STATS: historicStats,
             gender,
             _raw: row,
           };
@@ -316,6 +339,10 @@ export default function PlayerPageClient() {
   const partidos = player.MATCHES || 0;
   const ganados = player.WINS || 0;
   const efectividad = player.EFFECTIVENESS || 0;
+  const historicStats = player.HISTORIC_STATS || [];
+  const hasHistoricStats = historicStats.some((stat) =>
+    String(stat.value || "").trim(),
+  );
   const verified =
     String(player.VERIFIED || "").toLowerCase() === "true" ||
     String(player.VERIFIED || "").toLowerCase() === "1" ||
@@ -504,7 +531,7 @@ export default function PlayerPageClient() {
                   </div>
                   <div>
                     <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.9 }}>
-                      Puntos
+                      Categoria
                     </p>
                     <p
                       style={{
@@ -513,7 +540,7 @@ export default function PlayerPageClient() {
                         fontWeight: "700",
                       }}
                     >
-                      {points}
+                      {player.CATEGORY || "—"}
                     </p>
                   </div>
                 </div>
@@ -546,6 +573,27 @@ export default function PlayerPageClient() {
               >
                 <div
                   style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  <span
+                    style={{
+                      backgroundColor: "rgb(224, 231, 255)",
+                      color: "rgb(67, 56, 202)",
+                      padding: "0.2rem 0.75rem",
+                      borderRadius: "9999px",
+                      fontSize: "0.8rem",
+                      fontWeight: "600",
+                    }}
+                  >
+                    2026
+                  </span>
+                </div>
+                <div
+                  style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
                     gap: "1rem",
@@ -553,6 +601,26 @@ export default function PlayerPageClient() {
                     justifyItems: "center",
                   }}
                 >
+                  <div>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "rgb(100, 116, 139)",
+                        fontSize: "0.8rem",
+                      }}
+                    >
+                      Puntos
+                    </p>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "1.5rem",
+                        fontWeight: "700",
+                      }}
+                    >
+                      {points}
+                    </p>
+                  </div>
                   <div>
                     <p
                       style={{
@@ -654,6 +722,82 @@ export default function PlayerPageClient() {
                     </p>
                   </div>
                 </div>
+              </div>
+
+              <div
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: "1rem",
+                  padding: "1.5rem",
+                  border: "1px solid rgb(226, 232, 240)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  <span
+                    style={{
+                      backgroundColor: "rgb(226, 232, 240)",
+                      color: "rgb(51, 65, 85)",
+                      padding: "0.2rem 0.75rem",
+                      borderRadius: "9999px",
+                      fontSize: "0.8rem",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Historico
+                  </span>
+                </div>
+                {hasHistoricStats ? (
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(auto-fit, minmax(140px, 1fr))",
+                      gap: "1rem",
+                      textAlign: "center",
+                      justifyItems: "center",
+                    }}
+                  >
+                    {historicStats.map((stat) => (
+                      <div key={stat.stat}>
+                        <p
+                          style={{
+                            margin: 0,
+                            color: "rgb(100, 116, 139)",
+                            fontSize: "0.8rem",
+                          }}
+                        >
+                          {stat.stat}
+                        </p>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: "1.5rem",
+                            fontWeight: "700",
+                          }}
+                        >
+                          {stat.value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p
+                    style={{
+                      margin: 0,
+                      textAlign: "center",
+                      color: "rgb(100, 116, 139)",
+                    }}
+                  >
+                    Sin datos historicos
+                  </p>
+                )}
               </div>
 
               <div
