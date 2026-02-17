@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { fetchPlayers } from "@/lib/sheets";
+import {useEffect, useMemo, useRef, useState} from "react";
+import {useSearchParams} from "next/navigation";
+import {fetchPlayers} from "@/lib/sheets";
 import Filters from "@/components/Filters";
 import RankingTable from "@/components/RankingTable";
 import TopPlayersShowcase from "@/components/TopPlayersShowcase";
@@ -117,7 +117,7 @@ export default function HomePageClient() {
     if (!initializedRef.current || typeof window === "undefined") return;
     window.sessionStorage.setItem(
       storageKey,
-      JSON.stringify({ gender, category, nationality, sortBy, searchTerm }),
+      JSON.stringify({gender, category, nationality, sortBy, searchTerm}),
     );
 
     const params = new URLSearchParams(window.location.search);
@@ -217,9 +217,7 @@ export default function HomePageClient() {
           "linear-gradient(to bottom, rgb(241, 245, 249) 0%, rgb(219, 234, 254) 50%, rgb(226, 232, 240) 100%)",
       }}
     >
-      <div
-        style={{ maxWidth: "80rem", margin: "0 auto", padding: "3rem 1rem" }}
-      >
+      <div style={{maxWidth: "80rem", margin: "0 auto", padding: "3rem 1rem"}}>
         {/* Top Players Showcase */}
         {!loading && players.length > 0 && (
           <TopPlayersShowcase
@@ -231,7 +229,7 @@ export default function HomePageClient() {
 
         {/* Filters Section */}
         <section
-          style={{ marginBottom: "2rem", animation: "slideUp 0.5s ease-out" }}
+          style={{marginBottom: "2rem", animation: "slideUp 0.5s ease-out"}}
         >
           <Filters
             gender={gender}
@@ -475,7 +473,7 @@ export default function HomePageClient() {
                     marginBottom: "1rem",
                   }}
                 ></div>
-                <p style={{ color: "rgb(71, 85, 105)", fontWeight: "500" }}>
+                <p style={{color: "rgb(71, 85, 105)", fontWeight: "500"}}>
                   Cargando jugadores…
                 </p>
               </div>

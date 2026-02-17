@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import {useEffect, useState} from "react";
+import {useParams, useSearchParams} from "next/navigation";
 import Link from "next/link";
 import {
   fetchPlayers,
@@ -239,7 +239,7 @@ export default function PlayerPageClient() {
 
   if (!playerId) {
     return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
+      <div style={{padding: "2rem", textAlign: "center"}}>
         <p>Parámetro de jugador no proporcionado.</p>
         <Link
           href="/"
@@ -282,7 +282,7 @@ export default function PlayerPageClient() {
               marginBottom: "1rem",
             }}
           ></div>
-          <p style={{ color: "rgb(71, 85, 105)", fontWeight: "500" }}>
+          <p style={{color: "rgb(71, 85, 105)", fontWeight: "500"}}>
             Cargando…
           </p>
         </div>
@@ -292,9 +292,7 @@ export default function PlayerPageClient() {
 
   if (!player) {
     return (
-      <div
-        style={{ maxWidth: "80rem", margin: "0 auto", padding: "2rem 1rem" }}
-      >
+      <div style={{maxWidth: "80rem", margin: "0 auto", padding: "2rem 1rem"}}>
         <Link
           href={`/?gender=${encodeURIComponent(
             gender,
@@ -318,7 +316,7 @@ export default function PlayerPageClient() {
             boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
           }}
         >
-          <p style={{ color: "rgb(71, 85, 105)", fontSize: "1.125rem" }}>
+          <p style={{color: "rgb(71, 85, 105)", fontSize: "1.125rem"}}>
             Jugador no encontrado: {playerId}
           </p>
         </div>
@@ -370,9 +368,7 @@ export default function PlayerPageClient() {
         paddingBottom: "3rem",
       }}
     >
-      <div
-        style={{ maxWidth: "80rem", margin: "0 auto", padding: "2rem 1rem" }}
-      >
+      <div style={{maxWidth: "80rem", margin: "0 auto", padding: "2rem 1rem"}}>
         <Link
           href="/"
           style={{
@@ -383,7 +379,7 @@ export default function PlayerPageClient() {
             marginBottom: "2rem",
           }}
         >
-          ← Volver al ranking
+          ← Volver al ranking 
         </Link>
         <div
           style={{
@@ -434,7 +430,7 @@ export default function PlayerPageClient() {
                   }}
                 />
               )}
-              <div style={{ textAlign: "center" }}>
+              <div style={{textAlign: "center"}}>
                 <h1
                   style={{
                     fontSize: "2.5rem",
@@ -507,7 +503,7 @@ export default function PlayerPageClient() {
                   }}
                 >
                   <div>
-                    <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.9 }}>
+                    <p style={{margin: 0, fontSize: "0.9rem", opacity: 0.9}}>
                       ELO
                     </p>
                     <p
@@ -521,7 +517,7 @@ export default function PlayerPageClient() {
                     </p>
                   </div>
                   <div>
-                    <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.9 }}>
+                    <p style={{margin: 0, fontSize: "0.9rem", opacity: 0.9}}>
                       Categoria
                     </p>
                     <p
@@ -543,12 +539,10 @@ export default function PlayerPageClient() {
                     padding: "0.5rem 0.75rem",
                   }}
                 >
-                  <p style={{ margin: 0, fontSize: "0.75rem", opacity: 0.9 }}>
+                  <p style={{margin: 0, fontSize: "0.75rem", opacity: 0.9}}>
                     Ranking Global
                   </p>
-                  <p
-                    style={{ margin: 0, fontSize: "1.4rem", fontWeight: "700" }}
-                  >
+                  <p style={{margin: 0, fontSize: "1.4rem", fontWeight: "700"}}>
                     #{globalRank}
                   </p>
                 </div>
@@ -805,7 +799,7 @@ export default function PlayerPageClient() {
           <PlayerRadar player={player} />
         </div>
 
-        {/* Historico */}
+        {/* Histórico */}
         <div
           style={{
             backgroundColor: "white",
@@ -825,7 +819,7 @@ export default function PlayerPageClient() {
               textAlign: "center",
             }}
           >
-            Historico
+            Histórico
           </h2>
           {hasHistoricStats ? (
             <div
@@ -872,7 +866,7 @@ export default function PlayerPageClient() {
                 color: "rgb(100, 116, 139)",
               }}
             >
-              Sin datos historicos
+              Sin datos históricos
             </p>
           )}
         </div>
@@ -907,12 +901,12 @@ export default function PlayerPageClient() {
                 borderRadius: "1rem",
               }}
             >
-              <p style={{ color: "rgb(100, 116, 139)", fontSize: "1rem" }}>
+              <p style={{color: "rgb(100, 116, 139)", fontSize: "1rem"}}>
                 Sin resultados registrados para este jugador
               </p>
             </div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
+            <div style={{overflowX: "auto"}}>
               <table
                 style={{
                   width: "100%",
@@ -1001,7 +995,7 @@ export default function PlayerPageClient() {
                         (e.currentTarget.style.backgroundColor = "transparent")
                       }
                     >
-                      <td style={{ padding: "1rem" }}>
+                      <td style={{padding: "1rem"}}>
                         {r.DATE ||
                           r.Date ||
                           r.date ||
@@ -1027,7 +1021,7 @@ export default function PlayerPageClient() {
                           r.NAME ||
                           "-"}
                       </td>
-                      <td style={{ padding: "1rem" }}>
+                      <td style={{padding: "1rem"}}>
                         <span
                           style={{
                             backgroundColor: "rgb(165, 243, 252)",
@@ -1047,7 +1041,7 @@ export default function PlayerPageClient() {
                             "-"}
                         </span>
                       </td>
-                      <td style={{ padding: "1rem" }}>
+                      <td style={{padding: "1rem"}}>
                         {r.COUPLE_NAME ||
                           r.Couple_Name ||
                           r.couple_name ||
