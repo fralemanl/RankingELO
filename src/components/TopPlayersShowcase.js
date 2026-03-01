@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import Link from "next/link";
 import {
   buildGoogleDriveImageUrl,
   buildGoogleDriveThumbnailUrl,
 } from "@/lib/sheets";
 
-export default function TopPlayersShowcase({ players, gender, category }) {
+export default function TopPlayersShowcase({players, gender, category}) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const getFoto = (p) => (p?.FOTO || p?.Foto || p?.foto || "").trim();

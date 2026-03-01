@@ -6,7 +6,7 @@ import {
   buildGoogleDriveThumbnailUrl,
 } from "@/lib/sheets";
 
-export default function RankingTable({ players, allPlayers = [], category }) {
+export default function RankingTable({players, allPlayers = [], category}) {
   const getFoto = (p) => (p?.FOTO || p?.Foto || p?.foto || "").trim();
 
   const normalizeText = (value) =>
@@ -178,11 +178,9 @@ export default function RankingTable({ players, allPlayers = [], category }) {
             <th style={tableStyles.th}>Nac.</th>
             <th style={tableStyles.th}>Jugador</th>
             <th style={tableStyles.th}>Categoría</th>
-            <th style={{ ...tableStyles.th, textAlign: "center" }}>
-              Global 🌍
-            </th>
-            <th style={{ ...tableStyles.th, textAlign: "center" }}>ELO</th>
-            <th style={{ ...tableStyles.th, textAlign: "center" }}>Puntos</th>
+            <th style={{...tableStyles.th, textAlign: "center"}}>Global 🌍</th>
+            <th style={{...tableStyles.th, textAlign: "center"}}>ELO</th>
+            <th style={{...tableStyles.th, textAlign: "center"}}>Puntos</th>
           </tr>
         </thead>
         <tbody style={tableStyles.tbody}>
@@ -208,12 +206,10 @@ export default function RankingTable({ players, allPlayers = [], category }) {
               >
                 <td style={tableStyles.td}>
                   <div style={tableStyles.rankCell}>
-                    <span style={{ color: "rgb(100, 116, 139)" }}>
+                    <span style={{color: "rgb(100, 116, 139)"}}>
                       {categoryRank}
                     </span>
-                    {medal && (
-                      <span style={{ fontSize: "1.5rem" }}>{medal}</span>
-                    )}
+                    {medal && <span style={{fontSize: "1.5rem"}}>{medal}</span>}
                   </div>
                 </td>
                 <td style={tableStyles.td}>
@@ -232,7 +228,7 @@ export default function RankingTable({ players, allPlayers = [], category }) {
                         }}
                       />
                     ) : (
-                      <span style={{ color: "rgb(148, 163, 184)" }}>—</span>
+                      <span style={{color: "rgb(148, 163, 184)"}}>—</span>
                     )}
                   </div>
                 </td>
