@@ -169,14 +169,14 @@ export default function ComparePage() {
 
   const resolveCategory = (elo) => {
     if (elo === null || Number.isNaN(elo)) return "—";
-
-    if (elo >= 2200) return "1ra";
-    if (elo >= 2000) return "2da";
-    if (elo >= 1800) return "3ra";
-    if (elo >= 1600) return "4ta";
-    if (elo >= 1400) return "5ta";
-    if (elo >= 1200) return "6ta";
-    if (elo >= 1000) return "7ma";
+    if (elo > 2200) return "PRO";
+    if (elo > 2000) return "1ra";
+    if (elo > 1800) return "2da";
+    if (elo > 1600) return "3ra";
+    if (elo > 1400) return "4ta";
+    if (elo > 1200) return "5ta";
+    if (elo >= 1000) return "6ta";
+    if (elo < 1000) return "7ma";
 
     return "—";
   };
